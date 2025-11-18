@@ -39,6 +39,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
     @Shadow
     public abstract ServerWorld getEntityWorld();
 
+    @SuppressWarnings("UnusedReturnValue")
     @Shadow
     public abstract boolean changeGameMode(GameMode gameMode);
 
@@ -51,15 +52,17 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
     @Inject(method = "tick()V", at = @At("TAIL"))
     private void injectTickPlayer(CallbackInfo ci) {
         if (downButNotOut$isDowned()) {
-            if (this.bleedOutTimer == null && invisibleShulkerEntity == null) {
+            if (this.bleedOutTimer == null) {
                 downButNotOut$applyDowned(null);
-                bleedOutTimer = new BleedOutTimer(DownButNotOut.TICKS_UNTIL_BLEED_OUT, (ServerPlayerEntity) (Object) this, null);
+                bleedOutTimer = new BleedOutTimer(DownButNotOut.TICKS_UNTIL_BLEED_OUT,
+                        (ServerPlayerEntity) (Object) this, null);
                 bleedOutTimer.register();
             }
             forceCrawlPose();
         }
     }
 
+    // keep an invisible shulker entity at player's head to force crawling pose (server side workaround)
     @Unique
     private void forceCrawlPose() {
         Vec3d headPosition = new Vec3d(this.getX(), this.getY(), this.getZ()).offset(Direction.UP, 1.0);
@@ -76,11 +79,12 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         shulkerEntity.setNoGravity(true);
         shulkerEntity.setAiDisabled(true);
         shulkerEntity.setSilent(true);
-        shulkerEntity.setCustomNameVisible(true);
-        shulkerEntity.setBaby(true);
+        shulkerEntity.setCustomNameVisible(false);
+        shulkerEntity.setDespawnCounter((int)DownButNotOut.TICKS_UNTIL_BLEED_OUT * 2);
         EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
-        attributeInstance.setBaseValue(0.65);
-        StatusEffectInstance instance = new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false);
+        attributeInstance.setBaseValue(DownButNotOut.SHULKER_ENTITY_SCALE);
+        StatusEffectInstance instance =
+                new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false);
         shulkerEntity.addStatusEffect(instance);
         this.getEntityWorld().spawnEntity(this.invisibleShulkerEntity);
     }
@@ -89,10 +93,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
     public void downButNotOut$bleedOut(DamageSource damageSource) {
             this.setInvulnerable(false);
         if (damageSource != null) {
-            this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.PARTICLE_SOUL_ESCAPE.value(), SoundCategory.PLAYERS ,5.0F, 3.0F);
-            this.damage(this.getEntityWorld(), damageSource, 100f);
+            this.damage(this.getEntityWorld(), damageSource, this.getMaxHealth() * 255.0F); // should not survive
+            if (!this.isDead()) {
+                this.kill(this.getEntityWorld());
+            }
         } else {
-            DownButNotOut.LOGGER.debug(this.getName() + " failed to preserve DamageSource on bleed out! DamageSource: null");
+            this.kill(this.getEntityWorld());
+            DownButNotOut.LOGGER.debug(this.getName() + "'s DamageSource is NULL on bleed out");
             this.invisibleShulkerEntity.remove(RemovalReason.DISCARDED);
         }
     }
@@ -104,11 +111,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         this.setInvulnerable(true);
         this.changeGameMode(GameMode.ADVENTURE);
         this.setGlowing(true);
-        StatusEffectInstance darkness = new StatusEffectInstance(StatusEffects.DARKNESS, -1, 0, false, false);
+        StatusEffectInstance darkness =
+                new StatusEffectInstance(StatusEffects.DARKNESS, -1, 0, false, false);
         this.addStatusEffect(darkness);
         EntityAttributeInstance moveSpeed = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
-        this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ENTITY_TURTLE_EGG_BREAK, SoundCategory.PLAYERS ,4.0F, 2.0F);
-        moveSpeed.setBaseValue(0.01F);
+        this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ENTITY_TURTLE_EGG_BREAK,
+                SoundCategory.PLAYERS, DownButNotOut.DOWNED_SOUND_VOLUME, DownButNotOut.DOWNED_SOUND_PITCH);
+        moveSpeed.setBaseValue(DownButNotOut.DOWNED_MOVE_SPEED);
         createInvisibleShulkerBox();
     }
 
@@ -119,7 +128,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         this.changeGameMode(GameMode.SURVIVAL);
         this.setGlowing(false);
         EntityAttributeInstance moveSpeed = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
-        moveSpeed.setBaseValue(0.1F);
+        moveSpeed.setBaseValue(DownButNotOut.BASE_MOVE_SPEED);
         this.removeStatusEffect(StatusEffects.DARKNESS);
         this.invisibleShulkerEntity.remove(RemovalReason.DISCARDED);
     }
@@ -132,7 +141,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
     @Override
     public void downButNotOut$revive() {
         this.bleedOutTimer.setTicksUntilBleedOut(DownButNotOut.TICKS_UNTIL_BLEED_OUT);
-        this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS ,5.0F, 0.5F);
+        this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ITEM_TRIDENT_RETURN,
+                SoundCategory.PLAYERS, DownButNotOut.REVIVED_SOUND_VOLUME, DownButNotOut.REVIVED_SOUND_PITCH);
         this.downButNotOut$removeDowned();
     }
 
