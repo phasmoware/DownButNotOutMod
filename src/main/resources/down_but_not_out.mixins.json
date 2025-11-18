@@ -4,8 +4,10 @@
   "package": "com.phasmoware.down_but_not_out.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "EntityMixin"
   ],
   "server": [
+    "PlayerEntityMixin",
     "ServerPlayerEntityMixin"
   ],
   "injectors": {

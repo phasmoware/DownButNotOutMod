@@ -3,11 +3,20 @@ package com.phasmoware.down_but_not_out.mixin;
 import com.mojang.authlib.GameProfile;
 import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
-import net.minecraft.entity.EntityPose;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,6 +33,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
     @Unique
     private BleedOutTimer bleedOutTimer;
 
+    @Unique
+    private ShulkerEntity invisibleShulkerEntity;
+
     @Shadow
     public abstract ServerWorld getEntityWorld();
 
@@ -39,23 +51,49 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
     @Inject(method = "tick()V", at = @At("TAIL"))
     private void injectTickPlayer(CallbackInfo ci) {
         if (downButNotOut$isDowned()) {
-            this.setPose(EntityPose.DYING);
-            if (this.bleedOutTimer == null) {
+            if (this.bleedOutTimer == null && invisibleShulkerEntity == null) {
+                downButNotOut$applyDowned(null);
                 bleedOutTimer = new BleedOutTimer(DownButNotOut.TICKS_UNTIL_BLEED_OUT, (ServerPlayerEntity) (Object) this, null);
                 bleedOutTimer.register();
             }
+            forceCrawlPose();
         }
     }
 
+    @Unique
+    private void forceCrawlPose() {
+        Vec3d headPosition = new Vec3d(this.getX(), this.getY(), this.getZ()).offset(Direction.UP, 1.0);
+        if (!this.isInFluid()) {
+            this.invisibleShulkerEntity.setPosition(headPosition.x, headPosition.y, headPosition.z);
+        }
+    }
+
+    @Unique
+    private void createInvisibleShulkerBox() {
+        ShulkerEntity shulkerEntity = new ShulkerEntity(EntityType.SHULKER, this.getEntityWorld());
+        this.invisibleShulkerEntity = shulkerEntity;
+        shulkerEntity.setInvulnerable(true);
+        shulkerEntity.setNoGravity(true);
+        shulkerEntity.setAiDisabled(true);
+        shulkerEntity.setSilent(true);
+        shulkerEntity.setCustomNameVisible(true);
+        shulkerEntity.setBaby(true);
+        EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
+        attributeInstance.setBaseValue(0.65);
+        StatusEffectInstance instance = new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false);
+        shulkerEntity.addStatusEffect(instance);
+        this.getEntityWorld().spawnEntity(this.invisibleShulkerEntity);
+    }
 
     @Override
     public void downButNotOut$bleedOut(DamageSource damageSource) {
             this.setInvulnerable(false);
         if (damageSource != null) {
+            this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.PARTICLE_SOUL_ESCAPE.value(), SoundCategory.PLAYERS ,5.0F, 3.0F);
             this.damage(this.getEntityWorld(), damageSource, 100f);
         } else {
             DownButNotOut.LOGGER.debug(this.getName() + " failed to preserve DamageSource on bleed out! DamageSource: null");
-            this.kill(this.getEntityWorld());
+            this.invisibleShulkerEntity.remove(RemovalReason.DISCARDED);
         }
     }
 
@@ -66,6 +104,12 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         this.setInvulnerable(true);
         this.changeGameMode(GameMode.ADVENTURE);
         this.setGlowing(true);
+        StatusEffectInstance darkness = new StatusEffectInstance(StatusEffects.DARKNESS, -1, 0, false, false);
+        this.addStatusEffect(darkness);
+        EntityAttributeInstance moveSpeed = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
+        this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ENTITY_TURTLE_EGG_BREAK, SoundCategory.PLAYERS ,4.0F, 2.0F);
+        moveSpeed.setBaseValue(0.01F);
+        createInvisibleShulkerBox();
     }
 
     @Override
@@ -74,6 +118,10 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         this.setInvulnerable(false);
         this.changeGameMode(GameMode.SURVIVAL);
         this.setGlowing(false);
+        EntityAttributeInstance moveSpeed = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
+        moveSpeed.setBaseValue(0.1F);
+        this.removeStatusEffect(StatusEffects.DARKNESS);
+        this.invisibleShulkerEntity.remove(RemovalReason.DISCARDED);
     }
 
     @Override
@@ -83,6 +131,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
 
     @Override
     public void downButNotOut$revive() {
+        this.bleedOutTimer.setTicksUntilBleedOut(DownButNotOut.TICKS_UNTIL_BLEED_OUT);
+        this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS ,5.0F, 0.5F);
         this.downButNotOut$removeDowned();
     }
 
