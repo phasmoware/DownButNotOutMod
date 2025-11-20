@@ -29,14 +29,17 @@ public class BleedOutTimer implements ServerTickEvents.EndTick {
         if (this.player != null) {
             if (((PlayerDownButNotOut)player).downButNotOut$isDowned()) {
                 tickHeartbeats();
-                if (this.ticksUntilBleedOut > 0L) {
-                    --this.ticksUntilBleedOut;
-                    if (this.ticksUntilBleedOut == 0L) {
-                        ((PlayerDownButNotOut)player).downButNotOut$bleedOut(this.damageSource);
+                if (!((PlayerDownButNotOut)player).downButNotOut$isBeingRevived()) {
+                    if (this.ticksUntilBleedOut > 0L) {
+                        --this.ticksUntilBleedOut;
+                        if (this.ticksUntilBleedOut == 0L) {
+                            ((PlayerDownButNotOut)player).downButNotOut$bleedOut(this.damageSource);
+                        }
                     }
                 }
             }
         } else {
+            this.damageSource = null;
             DownButNotOut.LOGGER.info("BleedOutTimer player is null!");
         }
     }

@@ -66,6 +66,10 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
         interactionTicks = 0;
     }
 
+    public int getCurrentProgressPercent() {
+        return (int) ((((float) this.interactionTicks / (float) DownButNotOut.TICKS_UNTIL_REVIVE)) * 100);
+    }
+
     public long getInteractionTicks() {
         return interactionTicks;
     }

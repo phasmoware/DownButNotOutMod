@@ -24,10 +24,10 @@ public interface PlayerDownButNotOut {
 
     boolean downButNotOut$isBeingRevivedBy(ServerPlayerEntity reviver);
 
+    boolean downButNotOut$isBeingRevived();
+
     BleedOutTimer downButNotOut$getBleedOutTimer();
 
     ReviveTimer downButNotOut$getReviveTimer();
-
-    void downButNotOut$setBleedOutTimerInstance(BleedOutTimer bleedOutTimerInstance);
 
 }

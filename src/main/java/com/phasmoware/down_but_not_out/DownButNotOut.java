@@ -1,7 +1,6 @@
 package com.phasmoware.down_but_not_out;
 
 import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
-import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -14,7 +13,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.HashMap;
 
 
 public class DownButNotOut implements ModInitializer {
@@ -87,10 +85,6 @@ public class DownButNotOut implements ModInitializer {
             ((PlayerDownButNotOut)player).downButNotOut$applyDowned(damageSource);
             broadcastMessageToPlayers(player.getName().getLiteralString() + DOWNED_STATE_MSG,
                     player.getEntityWorld(), Formatting.RED);
-            // set a bleed out timer. The original damageSource will be used for the death message and statistics
-            BleedOutTimer timer = new BleedOutTimer(TICKS_UNTIL_BLEED_OUT, player, damageSource);
-            timer.register();
-            ((PlayerDownButNotOut)player).downButNotOut$setBleedOutTimerInstance(timer);
             return false;
         });
     }
@@ -148,6 +142,10 @@ public class DownButNotOut implements ModInitializer {
                         }
                     } else if (((PlayerDownButNotOut) targetPlayer).downButNotOut$isBeingRevivedBy((ServerPlayerEntity) playerEntity)) {
                         reviveTimer.incrementInteractionTicks();
+                        Text msgToReviver = Text.literal("Hold to Revive: " + reviveTimer.getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
+                        playerEntity.sendMessage(msgToReviver, USE_OVERLAY_MESSAGES);
+                        Text msgToDowned = Text.literal("Reviving: " + reviveTimer.getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
+                        targetPlayer.sendMessage(msgToDowned, USE_OVERLAY_MESSAGES);
                     }
                 }
                 return ActionResult.PASS;

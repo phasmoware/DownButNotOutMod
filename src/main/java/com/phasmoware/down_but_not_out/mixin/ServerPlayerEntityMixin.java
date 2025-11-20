@@ -61,9 +61,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         if (downButNotOut$isDowned()) {
             if (this.bleedOutTimer == null) {
                 downButNotOut$applyDowned(null);
-                bleedOutTimer = new BleedOutTimer(DownButNotOut.TICKS_UNTIL_BLEED_OUT,
-                        (ServerPlayerEntity) (Object) this, null);
-                bleedOutTimer.register();
             }
             forceCrawlPose();
         }
@@ -106,7 +103,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
             }
         } else {
             this.kill(this.getEntityWorld());
-            DownButNotOut.LOGGER.debug(this.getName() + "'s DamageSource is NULL on bleed out");
+            DownButNotOut.LOGGER.info(this.getName() + "'s DamageSource is NULL on bleed out");
             this.invisibleShulkerEntity.remove(RemovalReason.DISCARDED);
         }
     }
@@ -125,11 +122,22 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ENTITY_TURTLE_EGG_BREAK,
                 SoundCategory.PLAYERS, DownButNotOut.DOWNED_SOUND_VOLUME, DownButNotOut.DOWNED_SOUND_PITCH);
         moveSpeed.setBaseValue(DownButNotOut.DOWNED_MOVE_SPEED);
+
+        // set a bleed out timer. The original damageSource will be used for the death message and statistics
+        if (this.bleedOutTimer == null) {
+            this.bleedOutTimer = new BleedOutTimer(DownButNotOut.TICKS_UNTIL_BLEED_OUT, (ServerPlayerEntity) (Object) this, damageSource);
+            this.bleedOutTimer.register();
+        }
+
         createInvisibleShulkerBox();
     }
 
     @Override
     public void downButNotOut$removeDowned() {
+        if (this.bleedOutTimer != null) {
+            this.bleedOutTimer.setPlayer(null);
+            this.bleedOutTimer = null;
+        }
         this.removeCommandTag(DownButNotOut.DOWNED_TAG);
         this.setInvulnerable(false);
         this.changeGameMode(GameMode.SURVIVAL);
@@ -171,6 +179,11 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         return (this.isBeingRevived);
     }
 
+    @Override
+    public boolean downButNotOut$isBeingRevived() {
+        return (this.isBeingRevived);
+    }
+
 
     @Override
     public void downButNotOut$startReviving(ReviveTimer reviveTimer, ServerPlayerEntity reviver) {
@@ -194,12 +207,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
     @Override
     public ReviveTimer downButNotOut$getReviveTimer() {
         return this.reviveTimer;
-    }
-
-
-    @Override
-    public void downButNotOut$setBleedOutTimerInstance(BleedOutTimer bleedOutTimerInstance) {
-        this.bleedOutTimer = bleedOutTimerInstance;
     }
 
 }
