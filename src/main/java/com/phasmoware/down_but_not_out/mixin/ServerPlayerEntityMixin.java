@@ -3,6 +3,7 @@ package com.phasmoware.down_but_not_out.mixin;
 import com.mojang.authlib.GameProfile;
 import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
+import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -34,7 +35,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
     private BleedOutTimer bleedOutTimer;
 
     @Unique
+    private ReviveTimer reviveTimer;
+
+    @Unique
     private ShulkerEntity invisibleShulkerEntity;
+
+    @Unique
+    private boolean isBeingRevived;
 
     @Shadow
     public abstract ServerWorld getEntityWorld();
@@ -140,6 +147,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
 
     @Override
     public void downButNotOut$revive() {
+        this.downButNotOut$cancelReviving(this.reviveTimer);
         this.bleedOutTimer.setTicksUntilBleedOut(DownButNotOut.TICKS_UNTIL_BLEED_OUT);
         this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ITEM_TRIDENT_RETURN,
                 SoundCategory.PLAYERS, DownButNotOut.REVIVED_SOUND_VOLUME, DownButNotOut.REVIVED_SOUND_PITCH);
@@ -147,9 +155,47 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
     }
 
     @Override
+    public boolean downButNotOut$isBeingRevivedBy(ServerPlayerEntity reviver) {
+        if (this.reviveTimer == null) {
+            return false;
+        }
+        if (reviver == null) {
+            return false;
+        }
+        if (!(this.reviveTimer.getReviver().equals(reviver))) {
+            return false;
+        }
+        if (!(this.reviveTimer.isValidReviver(reviver, (ServerPlayerEntity) (Object) this))) {
+            return false;
+        }
+        return (this.isBeingRevived);
+    }
+
+
+    @Override
+    public void downButNotOut$startReviving(ReviveTimer reviveTimer, ServerPlayerEntity reviver) {
+        this.reviveTimer = reviveTimer;
+        this.reviveTimer.reset(reviver);
+        isBeingRevived = true;
+    }
+
+    @Override
+    public void downButNotOut$cancelReviving(ReviveTimer reviveTimer) {
+        reviveTimer.reset(null);
+        this.reviveTimer = null;
+        isBeingRevived = false;
+    }
+
+    @Override
     public BleedOutTimer downButNotOut$getBleedOutTimer() {
         return this.bleedOutTimer;
     }
+
+    @Override
+    public ReviveTimer downButNotOut$getReviveTimer() {
+        return this.reviveTimer;
+    }
+
 
     @Override
     public void downButNotOut$setBleedOutTimerInstance(BleedOutTimer bleedOutTimerInstance) {

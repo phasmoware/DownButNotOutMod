@@ -1,7 +1,9 @@
 package com.phasmoware.down_but_not_out.duck;
 
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
+import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public interface PlayerDownButNotOut {
 
@@ -16,7 +18,15 @@ public interface PlayerDownButNotOut {
 
     void downButNotOut$revive();
 
+    void downButNotOut$startReviving(ReviveTimer reviveTimer, ServerPlayerEntity reviver);
+
+    void downButNotOut$cancelReviving(ReviveTimer reviveTimer);
+
+    boolean downButNotOut$isBeingRevivedBy(ServerPlayerEntity reviver);
+
     BleedOutTimer downButNotOut$getBleedOutTimer();
+
+    ReviveTimer downButNotOut$getReviveTimer();
 
     void downButNotOut$setBleedOutTimerInstance(BleedOutTimer bleedOutTimerInstance);
 

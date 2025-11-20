@@ -2,6 +2,7 @@ package com.phasmoware.down_but_not_out;
 
 import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
+import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.player.*;
@@ -40,8 +41,8 @@ public class DownButNotOut implements ModInitializer {
     public static final float REVIVED_SOUND_PITCH = 0.6F;
     public static final float HEARTBEAT_SOUND_VOLUME = 1.0F;
     public static final double SHULKER_ENTITY_SCALE = 0.65d;
+    public static final long TICKS_UNTIL_REVIVE = 60L;
 
-    public static final HashMap<ServerPlayerEntity, BleedOutTimer> bleedOutTimers = new HashMap<>();
 
 
     @Override
@@ -89,7 +90,6 @@ public class DownButNotOut implements ModInitializer {
             // set a bleed out timer. The original damageSource will be used for the death message and statistics
             BleedOutTimer timer = new BleedOutTimer(TICKS_UNTIL_BLEED_OUT, player, damageSource);
             timer.register();
-            bleedOutTimers.put(player, timer);
             ((PlayerDownButNotOut)player).downButNotOut$setBleedOutTimerInstance(timer);
             return false;
         });
@@ -127,18 +127,30 @@ public class DownButNotOut implements ModInitializer {
 
         // prevent right click entity interaction while downed and listen for revive on downed player
         UseEntityCallback.EVENT.register(
-                (playerEntity, world, hand, entity, entityHitResult) -> {
-                    if (((PlayerDownButNotOut)playerEntity).downButNotOut$isDowned()) {
-                        return ActionResult.CONSUME;
-                    } else if (entity instanceof ServerPlayerEntity targetPlayer &&
-                            ((PlayerDownButNotOut)targetPlayer).downButNotOut$isDowned()) {
-                        broadcastMessageToPlayers(
-                                playerEntity.getName().getLiteralString() + REVIVED_MSG
-                                        + targetPlayer.getName().getLiteralString(),
-                                targetPlayer.getEntityWorld(), Formatting.GREEN);
-                        ((PlayerDownButNotOut)targetPlayer).downButNotOut$revive();
+            (playerEntity, world, hand, entity, entityHitResult) -> {
+                if (((PlayerDownButNotOut)playerEntity).downButNotOut$isDowned()) {
+                    return ActionResult.CONSUME;
+                } else if (entity instanceof ServerPlayerEntity targetPlayer
+                                                    && ((PlayerDownButNotOut)targetPlayer).downButNotOut$isDowned()) {
+
+                    ReviveTimer reviveTimer = ((PlayerDownButNotOut) targetPlayer).downButNotOut$getReviveTimer();
+                    if (!((PlayerDownButNotOut) targetPlayer).downButNotOut$isBeingRevivedBy((ServerPlayerEntity) playerEntity)) {
+                        if (reviveTimer == null) {
+                            reviveTimer = new ReviveTimer((ServerPlayerEntity) playerEntity, targetPlayer);
+                            reviveTimer.register();
+                            ((PlayerDownButNotOut) targetPlayer).downButNotOut$startReviving(reviveTimer, (ServerPlayerEntity) playerEntity);
+                            reviveTimer.incrementInteractionTicks();
+                        } else if (reviveTimer.getReviver() != null && !(reviveTimer.getReviver().equals(playerEntity))) {
+                            reviveTimer.reset((ServerPlayerEntity) playerEntity);
+                            ((PlayerDownButNotOut) targetPlayer).downButNotOut$cancelReviving(reviveTimer);
+                            ((PlayerDownButNotOut) targetPlayer).downButNotOut$startReviving(reviveTimer, (ServerPlayerEntity) playerEntity);
+                            reviveTimer.incrementInteractionTicks();
+                        }
+                    } else if (((PlayerDownButNotOut) targetPlayer).downButNotOut$isBeingRevivedBy((ServerPlayerEntity) playerEntity)) {
+                        reviveTimer.incrementInteractionTicks();
                     }
-                    return ActionResult.PASS;
+                }
+                return ActionResult.PASS;
         });
 
         // prevent right click item interaction while downed
@@ -148,12 +160,9 @@ public class DownButNotOut implements ModInitializer {
             }
             return ActionResult.PASS;
         });
-
-
-
     }
 
-    private void broadcastMessageToPlayers(String message, ServerWorld world, Formatting formatting) {
+    public static void broadcastMessageToPlayers(String message, ServerWorld world, Formatting formatting) {
         Text text = Text.literal(message).formatted(formatting);
         world.getServer().getPlayerManager().broadcast(text, USE_OVERLAY_MESSAGES);
     }
