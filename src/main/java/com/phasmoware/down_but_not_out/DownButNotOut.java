@@ -1,13 +1,17 @@
 package com.phasmoware.down_but_not_out;
 
+import com.phasmoware.down_but_not_out.command.ModCommands;
 import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.player.*;
 import net.minecraft.network.message.*;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
@@ -46,6 +50,7 @@ public class DownButNotOut implements ModInitializer {
     @Override
     public void onInitialize() {
         registerEventCallbacks();
+        ModCommands.initialize();
         LOGGER.info(MOD_ID + " mod initialized");
     }
 
@@ -85,6 +90,7 @@ public class DownButNotOut implements ModInitializer {
             ((PlayerDownButNotOut)player).downButNotOut$applyDowned(damageSource);
             broadcastMessageToPlayers(player.getName().getLiteralString() + DOWNED_STATE_MSG,
                     player.getEntityWorld(), Formatting.RED);
+            player.sendMessage(Text.literal("[Click here to give up]").setStyle(Style.EMPTY.withUnderline(true).withBold(true).withClickEvent(new ClickEvent.RunCommand("bleedout"))), false);
             return false;
         });
     }
