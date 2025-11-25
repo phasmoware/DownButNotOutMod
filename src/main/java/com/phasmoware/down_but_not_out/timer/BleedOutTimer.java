@@ -1,6 +1,7 @@
 package com.phasmoware.down_but_not_out.timer;
 
 import com.phasmoware.down_but_not_out.DownButNotOut;
+import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.damage.DamageSource;
@@ -47,12 +48,16 @@ public class BleedOutTimer implements ServerTickEvents.EndTick {
     // starts downed at 0.0 progress and ends at bleed out at 1.0 progress
     // for infinite downed ticks (-1)
     private float getCurrentProgress() {
+        if (totalTicks < 0L) {
+            return 1f;
+        }
+
         return 1f - (this.ticksUntilBleedOut / (float) this.totalTicks);
     }
 
     private void tickHeartbeats() {
         // disabled if Max Heartbeat volume is set to less than 0
-        if (DownButNotOut.HEARTBEAT_SOUND_VOLUME > 0) {
+        if (ModConfig.INSTANCE.HEARTBEAT_SOUND_VOLUME > 0) {
             float currentProgress = getCurrentProgress();
 
             // interval of 5 ticks min and 100 ticks max between heartbeats
@@ -72,7 +77,7 @@ public class BleedOutTimer implements ServerTickEvents.EndTick {
         // pitch slows down heartbeat as bleed out timer progresses
         float pitch = Math.max(0f, 1f - getCurrentProgress());
         this.player.getEntityWorld().playSoundFromEntity(null, this.player, SoundEvents.ENTITY_WARDEN_HEARTBEAT,
-                    SoundCategory.PLAYERS, DownButNotOut.HEARTBEAT_SOUND_VOLUME, pitch);
+                    SoundCategory.PLAYERS, ModConfig.INSTANCE.HEARTBEAT_SOUND_VOLUME, pitch);
     }
 
     public void register() {

@@ -1,6 +1,7 @@
 package com.phasmoware.down_but_not_out.mixin;
 
 import com.mojang.authlib.GameProfile;
+import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
@@ -84,7 +85,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         shulkerEntity.setAiDisabled(true);
         shulkerEntity.setSilent(true);
         shulkerEntity.setCustomNameVisible(false);
-        shulkerEntity.setDespawnCounter((int)DownButNotOut.TICKS_UNTIL_BLEED_OUT * 2);
+        shulkerEntity.setDespawnCounter((int)ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS * 2);
         EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
         attributeInstance.setBaseValue(DownButNotOut.SHULKER_ENTITY_SCALE);
         StatusEffectInstance instance =
@@ -120,12 +121,12 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         this.addStatusEffect(darkness);
         EntityAttributeInstance moveSpeed = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
         this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ENTITY_TURTLE_EGG_BREAK,
-                SoundCategory.PLAYERS, DownButNotOut.DOWNED_SOUND_VOLUME, DownButNotOut.DOWNED_SOUND_PITCH);
-        moveSpeed.setBaseValue(DownButNotOut.DOWNED_MOVE_SPEED);
+                SoundCategory.PLAYERS, ModConfig.INSTANCE.DOWNED_SOUND_VOLUME, DownButNotOut.DOWNED_SOUND_PITCH);
+        moveSpeed.setBaseValue(ModConfig.INSTANCE.DOWNED_MOVE_SPEED);
 
         // set a bleed out timer. The original damageSource will be used for the death message and statistics
         if (this.bleedOutTimer == null) {
-            this.bleedOutTimer = new BleedOutTimer(DownButNotOut.TICKS_UNTIL_BLEED_OUT, (ServerPlayerEntity) (Object) this, damageSource);
+            this.bleedOutTimer = new BleedOutTimer(ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS, (ServerPlayerEntity) (Object) this, damageSource);
             this.bleedOutTimer.register();
         }
 
@@ -156,9 +157,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
     @Override
     public void downButNotOut$revive() {
         this.downButNotOut$cancelReviving(this.reviveTimer);
-        this.bleedOutTimer.setTicksUntilBleedOut(DownButNotOut.TICKS_UNTIL_BLEED_OUT);
+        this.bleedOutTimer.setTicksUntilBleedOut(ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS);
         this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ITEM_TRIDENT_RETURN,
-                SoundCategory.PLAYERS, DownButNotOut.REVIVED_SOUND_VOLUME, DownButNotOut.REVIVED_SOUND_PITCH);
+                SoundCategory.PLAYERS, ModConfig.INSTANCE.REVIVED_SOUND_VOLUME, DownButNotOut.REVIVED_SOUND_PITCH);
         this.downButNotOut$removeDowned();
     }
 
@@ -207,6 +208,11 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
     @Override
     public ReviveTimer downButNotOut$getReviveTimer() {
         return this.reviveTimer;
+    }
+
+    @Override
+    public ShulkerEntity downButNotOut$getInvisibleShulkerEntity() {
+        return this.invisibleShulkerEntity;
     }
 
 }

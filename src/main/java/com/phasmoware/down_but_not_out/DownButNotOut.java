@@ -1,13 +1,15 @@
 package com.phasmoware.down_but_not_out;
 
 import com.phasmoware.down_but_not_out.command.ModCommands;
+import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.player.*;
+import net.minecraft.entity.Entity;
 import net.minecraft.network.message.*;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.ClickEvent;
@@ -28,7 +30,6 @@ public class DownButNotOut implements ModInitializer {
     public static final double CONE_SIZE = 0.002;
     public static final boolean ADJUST_FOR_DISTANCE = true;
     public static final boolean SEE_THROUGH_TRANSPARENT_BLOCKS = false;
-    public static final long TICKS_UNTIL_BLEED_OUT = 400L;
     public static final boolean SKIP_DOWNED_STATE_IF_NO_OTHER_PLAYERS = true;
     public static final String SKIPPED_DOWNED_STATE_MSG = "No one was available to revive you...";
     public static final String DOWNED_STATE_MSG = " is down, give them a hand to revive them";
@@ -36,12 +37,8 @@ public class DownButNotOut implements ModInitializer {
     public static final String BLED_OUT_MSG = "You bled out...";
     public static final boolean USE_OVERLAY_MESSAGES = true;
     public static final float BASE_MOVE_SPEED = 0.1F;
-    public static final float DOWNED_MOVE_SPEED = 0.01F;
-    public static final float DOWNED_SOUND_VOLUME = 2.0F;
     public static final float DOWNED_SOUND_PITCH = 1.2F;
-    public static final float REVIVED_SOUND_VOLUME = 2.0F;
     public static final float REVIVED_SOUND_PITCH = 0.6F;
-    public static final float HEARTBEAT_SOUND_VOLUME = 1.0F;
     public static final double SHULKER_ENTITY_SCALE = 0.65d;
     public static final long TICKS_UNTIL_REVIVE = 60L;
 
@@ -49,6 +46,7 @@ public class DownButNotOut implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        ModConfig.init();
         registerEventCallbacks();
         ModCommands.initialize();
         LOGGER.info(MOD_ID + " mod initialized");
@@ -57,6 +55,7 @@ public class DownButNotOut implements ModInitializer {
     public void registerEventCallbacks() {
         listenForDownedEvent();
         listenForInteractionWhileDowned();
+        listenForDownedDisconnect();
     }
 
 
@@ -164,6 +163,15 @@ public class DownButNotOut implements ModInitializer {
             }
             return ActionResult.PASS;
         });
+    }
+
+    private void listenForDownedDisconnect() {
+        ServerPlayerEvents.LEAVE.register(
+                playerEntity -> {
+                    if (((PlayerDownButNotOut)playerEntity).downButNotOut$isDowned()) {
+                        ((PlayerDownButNotOut)playerEntity).downButNotOut$getInvisibleShulkerEntity().remove(Entity.RemovalReason.DISCARDED);;
+                    }
+                });
     }
 
     public static void broadcastMessageToPlayers(String message, ServerWorld world, Formatting formatting) {
