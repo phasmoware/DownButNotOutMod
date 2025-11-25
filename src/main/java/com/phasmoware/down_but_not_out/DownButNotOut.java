@@ -30,17 +30,14 @@ public class DownButNotOut implements ModInitializer {
     public static final double CONE_SIZE = 0.002;
     public static final boolean ADJUST_FOR_DISTANCE = true;
     public static final boolean SEE_THROUGH_TRANSPARENT_BLOCKS = false;
-    public static final boolean SKIP_DOWNED_STATE_IF_NO_OTHER_PLAYERS = true;
     public static final String SKIPPED_DOWNED_STATE_MSG = "No one was available to revive you...";
     public static final String DOWNED_STATE_MSG = " is down, give them a hand to revive them";
     public static final String REVIVED_MSG = " has revived ";
     public static final String BLED_OUT_MSG = "You bled out...";
-    public static final boolean USE_OVERLAY_MESSAGES = true;
     public static final float BASE_MOVE_SPEED = 0.1F;
     public static final float DOWNED_SOUND_PITCH = 1.2F;
     public static final float REVIVED_SOUND_PITCH = 0.6F;
     public static final double SHULKER_ENTITY_SCALE = 0.65d;
-    public static final long TICKS_UNTIL_REVIVE = 60L;
 
 
 
@@ -61,31 +58,31 @@ public class DownButNotOut implements ModInitializer {
 
     private void listenForDownedEvent() {
         ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
+            // if mod disabled in config, allow death like normal
+            if (!ModConfig.INSTANCE.MOD_ENABLED) {
+                return true;
+            }
+
             if (!(entity instanceof ServerPlayerEntity player)) {
                 return true;
             }
 
             if (((PlayerDownButNotOut)player).downButNotOut$isDowned()) {
                 ((PlayerDownButNotOut)player).downButNotOut$removeDowned();
-                player.sendMessage(Text.literal(BLED_OUT_MSG).formatted(Formatting.RED), USE_OVERLAY_MESSAGES);
+                player.sendMessage(Text.literal(BLED_OUT_MSG).formatted(Formatting.RED), ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
                 return true;
             }
 
-            if (player.isInLava() && player.isOnFire()) {
+            if (player.isInLava() && player.isOnFire() && !ModConfig.INSTANCE.ALLOW_DOWNED_STATE_IN_LAVA) {
                 return true;
             }
 
-            // TODO: if player falls into void
-//            if (damageSource.getType().equals(DamageTypes.OUT_OF_WORLD)) {
-//                return true;
-//            }
-
-            if (SKIP_DOWNED_STATE_IF_NO_OTHER_PLAYERS && player.getEntityWorld().getServer().getCurrentPlayerCount() <= 1) {
-                player.sendMessage(Text.literal(SKIPPED_DOWNED_STATE_MSG).formatted(Formatting.RED), USE_OVERLAY_MESSAGES);
+            if (ModConfig.INSTANCE.SKIP_DOWNED_STATE_IF_NO_OTHER_PLAYERS_ONLINE && player.getEntityWorld().getServer().getCurrentPlayerCount() <= 1) {
+                player.sendMessage(Text.literal(SKIPPED_DOWNED_STATE_MSG).formatted(Formatting.RED), ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
                 return true;
             }
 
-            // prevent death and apply downed state instead
+            // else prevent death and apply downed state instead
             ((PlayerDownButNotOut)player).downButNotOut$applyDowned(damageSource);
             broadcastMessageToPlayers(player.getName().getLiteralString() + DOWNED_STATE_MSG,
                     player.getEntityWorld(), Formatting.RED);
@@ -148,9 +145,9 @@ public class DownButNotOut implements ModInitializer {
                     } else if (((PlayerDownButNotOut) targetPlayer).downButNotOut$isBeingRevivedBy((ServerPlayerEntity) playerEntity)) {
                         reviveTimer.incrementInteractionTicks();
                         Text msgToReviver = Text.literal("Hold to Revive: " + reviveTimer.getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
-                        playerEntity.sendMessage(msgToReviver, USE_OVERLAY_MESSAGES);
+                        playerEntity.sendMessage(msgToReviver, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
                         Text msgToDowned = Text.literal("Reviving: " + reviveTimer.getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
-                        targetPlayer.sendMessage(msgToDowned, USE_OVERLAY_MESSAGES);
+                        targetPlayer.sendMessage(msgToDowned, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
                     }
                 }
                 return ActionResult.PASS;
@@ -176,6 +173,6 @@ public class DownButNotOut implements ModInitializer {
 
     public static void broadcastMessageToPlayers(String message, ServerWorld world, Formatting formatting) {
         Text text = Text.literal(message).formatted(formatting);
-        world.getServer().getPlayerManager().broadcast(text, USE_OVERLAY_MESSAGES);
+        world.getServer().getPlayerManager().broadcast(text, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
     }
 }

@@ -115,10 +115,14 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         this.addCommandTag(DownButNotOut.DOWNED_TAG);
         this.setInvulnerable(true);
         this.changeGameMode(GameMode.ADVENTURE);
-        this.setGlowing(true);
-        StatusEffectInstance darkness =
-                new StatusEffectInstance(StatusEffects.DARKNESS, -1, 0, false, false);
-        this.addStatusEffect(darkness);
+        if (ModConfig.INSTANCE.DOWNED_PLAYERS_HAVE_GLOW_EFFECT) {
+            this.setGlowing(true);
+        }
+        if (ModConfig.INSTANCE.DOWNED_PLAYERS_HAVE_BLINDNESS_EFFECT) {
+            StatusEffectInstance darkness =
+                    new StatusEffectInstance(StatusEffects.DARKNESS, -1, 0, false, false);
+            this.addStatusEffect(darkness);
+        }
         EntityAttributeInstance moveSpeed = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
         this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ENTITY_TURTLE_EGG_BREAK,
                 SoundCategory.PLAYERS, ModConfig.INSTANCE.DOWNED_SOUND_VOLUME, DownButNotOut.DOWNED_SOUND_PITCH);

@@ -1,6 +1,7 @@
 package com.phasmoware.down_but_not_out.timer;
 
 import com.phasmoware.down_but_not_out.DownButNotOut;
+import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
@@ -23,7 +24,7 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
     public void onEndTick(MinecraftServer minecraftServer) {
         counter++;
         if (isValidReviver(this.reviver, this.downed)) {
-            if (this.interactionTicks >= DownButNotOut.TICKS_UNTIL_REVIVE) {
+            if (this.interactionTicks >= ModConfig.INSTANCE.REVIVE_DURATION_TICKS) {
                 DownButNotOut.broadcastMessageToPlayers(reviver.getName().getLiteralString() + DownButNotOut.REVIVED_MSG +
                         downed.getName().getLiteralString(), downed.getEntityWorld(), Formatting.GREEN);
                 ((PlayerDownButNotOut)this.downed).downButNotOut$revive();
@@ -67,7 +68,7 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
     }
 
     public int getCurrentProgressPercent() {
-        return (int) ((((float) this.interactionTicks / (float) DownButNotOut.TICKS_UNTIL_REVIVE)) * 100);
+        return (int) ((((float) this.interactionTicks / (float) ModConfig.INSTANCE.REVIVE_DURATION_TICKS)) * 100);
     }
 
     public long getInteractionTicks() {
