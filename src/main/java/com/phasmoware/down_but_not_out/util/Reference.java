@@ -19,4 +19,5 @@ public class Reference {
     public static final float DOWNED_SOUND_PITCH = 1.2F;
     public static final float REVIVED_SOUND_PITCH = 0.6F;
     public static final double MIN_ENTITY_SCALE = 0.0625d;
+    public static final float PLAYER_MAX_HEALTH = 1024.5f;
 }

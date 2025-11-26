@@ -5,25 +5,18 @@ import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
-import com.phasmoware.down_but_not_out.util.Reference;
+import com.phasmoware.down_but_not_out.util.DownedUtility;
+import com.phasmoware.down_but_not_out.util.SoundUtility;
 import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.attribute.EntityAttributeInstance;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -55,10 +48,6 @@ public abstract class ServerServerPlayerEntityMixin extends PlayerEntity impleme
     @Shadow
     public abstract ServerWorld getEntityWorld();
 
-    @SuppressWarnings("UnusedReturnValue")
-    @Shadow
-    public abstract boolean changeGameMode(GameMode gameMode);
-
     public ServerServerPlayerEntityMixin(World world, GameProfile profile) {
         super(world, profile);
     }
@@ -85,81 +74,22 @@ public abstract class ServerServerPlayerEntityMixin extends PlayerEntity impleme
                 this.invisibleArmorStandEntity.setVelocity(Vec3d.ZERO);
                 this.invisibleArmorStandEntity.fallDistance = 0;
             } else if (this.invisibleShulkerEntity == null || this.invisibleShulkerEntity.isRemoved()) {
-                createInvisibleShulkerBox();
+                DownedUtility.setInvisibleShulkerArmorStandRider(this, getEntityWorld());
             }
         }
-    }
-
-    @Unique
-    private void createInvisibleShulkerBox() {
-        // create ArmorStand (vehicle)
-        ArmorStandEntity armorStand = new ArmorStandEntity(EntityType.ARMOR_STAND, this.getEntityWorld());
-        this.invisibleArmorStandEntity = armorStand;
-        armorStand.setInvisible(true);
-        armorStand.setNoGravity(true);
-        armorStand.setInvulnerable(true);
-        armorStand.setSilent(true);
-        armorStand.setCustomNameVisible(false);
-        ((ArmorStandEntityAccessor) armorStand).invokeSetMarker(true);
-        ((ArmorStandEntityAccessor) armorStand).invokeSetSmall(true);
-        EntityAttributeInstance armorStandScale = armorStand.getAttributeInstance(EntityAttributes.SCALE);
-        armorStandScale.setBaseValue(Reference.MIN_ENTITY_SCALE);
-
-
-        // create Shulker (passenger)
-        ShulkerEntity shulkerEntity = new ShulkerEntity(EntityType.SHULKER, this.getEntityWorld());
-        this.invisibleShulkerEntity = shulkerEntity;
-        shulkerEntity.setInvulnerable(true);
-        shulkerEntity.setNoGravity(true);
-        shulkerEntity.setAiDisabled(true);
-        shulkerEntity.setSilent(true);
-        shulkerEntity.setCustomNameVisible(false);
-
-        EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
-        attributeInstance.setBaseValue(Reference.MIN_ENTITY_SCALE);
-
-        StatusEffectInstance instance = new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false);
-        shulkerEntity.addStatusEffect(instance);
-
-        // spawn and mount
-        this.getEntityWorld().spawnEntity(armorStand);
-        this.getEntityWorld().spawnEntity(shulkerEntity);
-        shulkerEntity.startRiding(armorStand, true, true);
     }
 
     @Override
     public void downButNotOut$bleedOut(DamageSource damageSource) {
-        this.setInvulnerable(false);
-        if (damageSource != null) {
-            this.damage(this.getEntityWorld(), damageSource, this.getMaxHealth() * 255.0F); // should not survive
-            if (!this.isDead()) {
-                this.kill(this.getEntityWorld());
-            }
-        } else {
-            this.kill(this.getEntityWorld());
-            Reference.LOGGER.info(this.getName() + "'s DamageSource is NULL on bleed out");
-            downButNotOut$cleanupDownedEntities();
-        }
+        DownedUtility.bleedOut((ServerPlayerEntity) (Object) this, damageSource);
+        DownedUtility.cleanUpInvisibleEntities(this);
     }
 
     @Override
     public void downButNotOut$applyDowned(DamageSource damageSource) {
-        this.setHealth(Reference.HEARTS_AFTER_REVIVE);
-        this.addCommandTag(Reference.DOWNED_TAG);
-        this.setInvulnerable(true);
-        this.changeGameMode(GameMode.ADVENTURE);
-        if (ModConfig.INSTANCE.DOWNED_PLAYERS_HAVE_GLOW_EFFECT) {
-            this.setGlowing(true);
-        }
-        if (ModConfig.INSTANCE.DOWNED_PLAYERS_HAVE_BLINDNESS_EFFECT) {
-            StatusEffectInstance darkness = new StatusEffectInstance(StatusEffects.DARKNESS, -1, 0, false, false);
-            this.addStatusEffect(darkness);
-        }
-        EntityAttributeInstance moveSpeed = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
-        moveSpeed.setBaseValue(ModConfig.INSTANCE.DOWNED_MOVE_SPEED);
+        DownedUtility.applyDownedState((ServerPlayerEntity) (Object) this);
 
-        this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ENTITY_TURTLE_EGG_BREAK,
-                SoundCategory.PLAYERS, ModConfig.INSTANCE.DOWNED_SOUND_VOLUME, Reference.DOWNED_SOUND_PITCH);
+        SoundUtility.playDownedSound((ServerPlayerEntity) (Object) this);
 
         // set a bleed out timer (original damageSource will be used for the death)
         // message and statistics
@@ -169,7 +99,7 @@ public abstract class ServerServerPlayerEntityMixin extends PlayerEntity impleme
             this.bleedOutTimer.register();
         }
 
-        createInvisibleShulkerBox();
+        DownedUtility.setInvisibleShulkerArmorStandRider(this, getEntityWorld());
     }
 
     @Override
@@ -178,15 +108,8 @@ public abstract class ServerServerPlayerEntityMixin extends PlayerEntity impleme
             this.bleedOutTimer.setPlayer(null);
             this.bleedOutTimer = null;
         }
-        this.removeCommandTag(Reference.DOWNED_TAG);
-        this.setInvulnerable(false);
-        this.changeGameMode(GameMode.SURVIVAL);
-        this.setGlowing(false);
-        EntityAttributeInstance moveSpeed = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
-        moveSpeed.setBaseValue(Reference.BASE_MOVE_SPEED);
-        this.removeStatusEffect(StatusEffects.DARKNESS);
-        this.removeStatusEffect(StatusEffects.SLOWNESS);
-        downButNotOut$cleanupDownedEntities();
+        DownedUtility.removeDownedState((ServerPlayerEntity)  (Object) this);
+        DownedUtility.cleanUpInvisibleEntities(this);
     }
 
 
@@ -194,8 +117,8 @@ public abstract class ServerServerPlayerEntityMixin extends PlayerEntity impleme
     public void downButNotOut$revive() {
         this.downButNotOut$cancelReviving(this.reviveTimer);
         this.bleedOutTimer.setTicksUntilBleedOut(ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS);
-        this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ITEM_TRIDENT_RETURN,
-                SoundCategory.PLAYERS, ModConfig.INSTANCE.REVIVED_SOUND_VOLUME, Reference.REVIVED_SOUND_PITCH);
+        SoundUtility.playRevivedSound((ServerPlayerEntity) (Object) this);
+
         this.downButNotOut$removeDowned();
     }
 
@@ -251,15 +174,18 @@ public abstract class ServerServerPlayerEntityMixin extends PlayerEntity impleme
     }
 
     @Override
-    public void downButNotOut$cleanupDownedEntities() {
-        if (this.invisibleShulkerEntity != null) {
-            this.invisibleShulkerEntity.remove(RemovalReason.DISCARDED);
-            this.invisibleShulkerEntity = null;
-        }
-        if (this.invisibleArmorStandEntity != null) {
-            this.invisibleArmorStandEntity.remove(RemovalReason.DISCARDED);
-            this.invisibleArmorStandEntity = null;
-        }
+    public void downButNotOut$setInvisibleShulkerEntity(ShulkerEntity shulkerEntity) {
+        this.invisibleShulkerEntity = shulkerEntity;
+    }
+
+    @Override
+    public ArmorStandEntity downButNotOut$getInvisibleArmorStandEntity() {
+        return this.invisibleArmorStandEntity;
+    }
+
+    @Override
+    public void downButNotOut$setInvisibleArmorStandEntity(ArmorStandEntity armorStandEntity) {
+        this.invisibleArmorStandEntity = armorStandEntity;
     }
 
 }

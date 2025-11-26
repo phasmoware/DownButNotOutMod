@@ -2,12 +2,11 @@ package com.phasmoware.down_but_not_out.timer;
 
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
+import com.phasmoware.down_but_not_out.util.SoundUtility;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 
 import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
 
@@ -76,8 +75,7 @@ public class BleedOutTimer implements ServerTickEvents.EndTick {
     private void playHeartbeatSound() {
         // pitch slows down heartbeat as bleed out timer progresses
         float pitch = Math.max(0f, 1f - getCurrentProgress());
-        this.player.getEntityWorld().playSoundFromEntity(null, this.player, SoundEvents.ENTITY_WARDEN_HEARTBEAT,
-                SoundCategory.PLAYERS, ModConfig.INSTANCE.HEARTBEAT_SOUND_VOLUME, pitch);
+        SoundUtility.playHeartBeatSound(this.player, pitch);
     }
 
     public void register() {

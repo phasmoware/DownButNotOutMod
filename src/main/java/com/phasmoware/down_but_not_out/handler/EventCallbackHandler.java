@@ -3,6 +3,7 @@ package com.phasmoware.down_but_not_out.handler;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
+import com.phasmoware.down_but_not_out.util.DownedUtility;
 import com.phasmoware.down_but_not_out.util.Reference;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -98,6 +99,6 @@ public class EventCallbackHandler {
     }
 
     public static void onCleanUpEvent(PlayerEntity playerEntity) {
-        ((ServerPlayerAPI) playerEntity).downButNotOut$cleanupDownedEntities();
+        DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI)  playerEntity);
     }
 }
