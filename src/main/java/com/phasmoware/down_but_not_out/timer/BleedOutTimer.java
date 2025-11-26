@@ -43,13 +43,12 @@ public class BleedOutTimer {
         }
     }
 
-    // starts downed at 0.0 progress and ends at bleed out at 1.0 progress
-    // for infinite downed ticks (-1)
+    // starts downed at 0.0 progress and ends at bleed out at 1f progress
+    // for infinite downed ticks (-1f) just return 1f
     private float getCurrentProgress() {
         if (totalTicks < 0L) {
             return 1f;
         }
-
         return 1f - (this.ticksUntilBleedOut / (float) this.totalTicks);
     }
 

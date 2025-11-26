@@ -91,4 +91,21 @@ public class DownedStateManager {
         Text skippedDownedStateMessage = Text.literal(Constants.LAVA_PREVENTED_DOWNED_MSG).formatted(Formatting.RED);
         MessageHandler.sendUpdateMessage(skippedDownedStateMessage, player);
     }
+
+    public static void onPlayerRevivingWithoutEmptyHand(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
+        Text msgToReviver = Text.literal("Use a free hand to revive them!").formatted(Formatting.RED);
+        MessageHandler.sendUpdateMessage(msgToReviver, reviver);
+        MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
+    }
+
+    public static void onPlayerRevivingTooFarAway(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
+        Text msgToReviver = Text.literal("Too far away to revive them!").formatted(Formatting.RED);
+        MessageHandler.sendUpdateMessage(msgToReviver, reviver);
+        MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
+    }
+
+    public static void onPlayerLookingAwayWhileReviving(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
+        MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, reviver);
+        MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
+    }
 }

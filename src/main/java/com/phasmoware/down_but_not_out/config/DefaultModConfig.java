@@ -3,6 +3,7 @@ package com.phasmoware.down_but_not_out.config;
 public class DefaultModConfig {
     public boolean MOD_ENABLED = true;
     public boolean SKIP_DOWNED_STATE_IF_NO_OTHER_PLAYERS_ONLINE = true;
+    public boolean REVIVING_REQUIRES_EMPTY_HAND = true;
     public boolean ALLOW_DOWNED_STATE_IN_LAVA = false;
     public boolean USE_OVERLAY_MESSAGES = true;
     public boolean DOWNED_PLAYERS_HAVE_GLOW_EFFECT = true;

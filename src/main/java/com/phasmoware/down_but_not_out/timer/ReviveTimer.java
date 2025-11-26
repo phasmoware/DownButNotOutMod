@@ -57,21 +57,17 @@ public class ReviveTimer {
         if (!isDowned(downed)) {
             return false;
         }
-        if (!reviver.getMainHandStack().isEmpty()) {
-            Text msgToReviver = Text.literal("Use a free hand to revive them!").formatted(Formatting.RED);
-            MessageHandler.sendUpdateMessage(msgToReviver, reviver);
-            MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
+        if (!(reviver.getMainHandStack().isEmpty() && ModConfig.INSTANCE.REVIVING_REQUIRES_EMPTY_HAND)) {
+            DownedStateManager.onPlayerRevivingWithoutEmptyHand(reviver, downed);
             return false;
         }
-        if ((reviver.squaredDistanceTo(downed) > reviver.getEntityInteractionRange() + 1.5)) {
-            Text msgToReviver = Text.literal("Too far away to revive them!").formatted(Formatting.RED);
-            MessageHandler.sendUpdateMessage(msgToReviver, reviver);
-            MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
+        if ((reviver.squaredDistanceTo(downed) > reviver.getBlockInteractionRange())) {
+            DownedStateManager.onPlayerRevivingTooFarAway(reviver, downed);
+
             return false;
         }
         if (!downed.isEntityLookingAtMe(reviver, Constants.CONE_SIZE, Constants.ADJUST_FOR_DISTANCE, Constants.SEE_THROUGH_TRANSPARENT_BLOCKS, new double[]{downed.getY(), downed.getEyeY()})) {
-            MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, reviver);
-            MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
+            DownedStateManager.onPlayerLookingAwayWhileReviving(reviver, downed);
             return false;
         }
         return true;
