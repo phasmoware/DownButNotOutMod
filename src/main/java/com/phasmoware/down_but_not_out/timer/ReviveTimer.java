@@ -2,12 +2,16 @@ package com.phasmoware.down_but_not_out.timer;
 
 import com.phasmoware.down_but_not_out.DownButNotOut;
 import com.phasmoware.down_but_not_out.config.ModConfig;
-import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
+import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
+import com.phasmoware.down_but_not_out.handler.SendMessageHandler;
+import com.phasmoware.down_but_not_out.util.Reference;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
+import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
 
 public class ReviveTimer implements ServerTickEvents.EndTick {
     private boolean interactionActive = false;
@@ -35,12 +39,12 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
             }
             if (isValidReviver(this.reviver, this.downed)) {
                 if (this.interactionTicks >= ModConfig.INSTANCE.REVIVE_DURATION_TICKS) {
-                    DownButNotOut.broadcastMessageToPlayers(reviver.getName().getLiteralString() + DownButNotOut.REVIVED_MSG +
+                    SendMessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() + Reference.REVIVED_MSG +
                             downed.getName().getLiteralString(), downed.getEntityWorld(), Formatting.GREEN);
-                    ((PlayerDownButNotOut)this.downed).downButNotOut$revive();
+                    ((ServerPlayerAPI)this.downed).downButNotOut$revive();
 
                 } else if ((counter - 10) > interactionTicks) {
-                    ((PlayerDownButNotOut)this.downed).downButNotOut$cancelReviving(this);
+                    ((ServerPlayerAPI)this.downed).downButNotOut$cancelReviving(this);
                 }
             }
         }
@@ -57,10 +61,10 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
         if (reviver == downed) {
             return false;
         }
-        if (((PlayerDownButNotOut)reviver).downButNotOut$isDowned()) {
+        if (isDowned(reviver)) {
             return false;
         }
-        if (!((PlayerDownButNotOut)downed).downButNotOut$isDowned()) {
+        if (!isDowned(downed)) {
             return false;
         }
         if (!reviver.getMainHandStack().isEmpty()) {
@@ -73,7 +77,7 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
             reviver.sendMessage(msgToReviver, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
             return false;
         }
-        if (!downed.isEntityLookingAtMe(reviver, DownButNotOut.CONE_SIZE, DownButNotOut.ADJUST_FOR_DISTANCE, DownButNotOut.SEE_THROUGH_TRANSPARENT_BLOCKS, new double[]{downed.getY(), downed.getY() + 0.25})) {
+        if (!downed.isEntityLookingAtMe(reviver, Reference.CONE_SIZE, Reference.ADJUST_FOR_DISTANCE, Reference.SEE_THROUGH_TRANSPARENT_BLOCKS, new double[]{downed.getY(), downed.getEyeY()})) {
             return false;
         }
         return true;

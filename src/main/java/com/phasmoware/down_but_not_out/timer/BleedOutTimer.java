@@ -1,13 +1,15 @@
 package com.phasmoware.down_but_not_out.timer;
 
 import com.phasmoware.down_but_not_out.config.ModConfig;
-import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
+import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+
+import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
 
 public class BleedOutTimer implements ServerTickEvents.EndTick {
 
@@ -27,13 +29,13 @@ public class BleedOutTimer implements ServerTickEvents.EndTick {
     @Override
     public void onEndTick(MinecraftServer minecraftServer) {
         if (this.player != null) {
-            if (((PlayerDownButNotOut) player).downButNotOut$isDowned()) {
+            if (isDowned(player)) {
                 tickHeartbeats();
-                if (!((PlayerDownButNotOut) player).downButNotOut$isBeingRevived()) {
+                if (!((ServerPlayerAPI) player).downButNotOut$isBeingRevived()) {
                     if (this.ticksUntilBleedOut > 0L) {
                         --this.ticksUntilBleedOut;
                         if (this.ticksUntilBleedOut == 0L) {
-                            ((PlayerDownButNotOut) player).downButNotOut$bleedOut(this.damageSource);
+                            ((ServerPlayerAPI) player).downButNotOut$bleedOut(this.damageSource);
                         }
                     }
                 }

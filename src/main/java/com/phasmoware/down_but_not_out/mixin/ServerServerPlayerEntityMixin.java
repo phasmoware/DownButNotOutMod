@@ -2,9 +2,10 @@ package com.phasmoware.down_but_not_out.mixin;
 
 import com.mojang.authlib.GameProfile;
 import com.phasmoware.down_but_not_out.config.ModConfig;
-import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
+import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
+import com.phasmoware.down_but_not_out.util.Reference;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
@@ -30,10 +31,11 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import com.phasmoware.down_but_not_out.DownButNotOut;
+
+import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin extends PlayerEntity implements PlayerDownButNotOut {
+public abstract class ServerServerPlayerEntityMixin extends PlayerEntity implements ServerPlayerAPI {
 
     @Unique
     private BleedOutTimer bleedOutTimer;
@@ -57,13 +59,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
     @Shadow
     public abstract boolean changeGameMode(GameMode gameMode);
 
-    public ServerPlayerEntityMixin(World world, GameProfile profile) {
+    public ServerServerPlayerEntityMixin(World world, GameProfile profile) {
         super(world, profile);
     }
 
     @Inject(method = "tick()V", at = @At("TAIL"))
     private void injectTickPlayer(CallbackInfo ci) {
-        if (downButNotOut$isDowned()) {
+        if (isDowned(this)) {
             if (this.bleedOutTimer == null) {
                 downButNotOut$applyDowned(null);
             }
@@ -101,7 +103,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         ((ArmorStandEntityAccessor) armorStand).invokeSetMarker(true);
         ((ArmorStandEntityAccessor) armorStand).invokeSetSmall(true);
         EntityAttributeInstance armorStandScale = armorStand.getAttributeInstance(EntityAttributes.SCALE);
-        armorStandScale.setBaseValue(DownButNotOut.MIN_ENTITY_SCALE);
+        armorStandScale.setBaseValue(Reference.MIN_ENTITY_SCALE);
 
 
         // create Shulker (passenger)
@@ -114,7 +116,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         shulkerEntity.setCustomNameVisible(false);
 
         EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
-        attributeInstance.setBaseValue(DownButNotOut.MIN_ENTITY_SCALE);
+        attributeInstance.setBaseValue(Reference.MIN_ENTITY_SCALE);
 
         StatusEffectInstance instance = new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false);
         shulkerEntity.addStatusEffect(instance);
@@ -135,15 +137,15 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
             }
         } else {
             this.kill(this.getEntityWorld());
-            DownButNotOut.LOGGER.info(this.getName() + "'s DamageSource is NULL on bleed out");
+            Reference.LOGGER.info(this.getName() + "'s DamageSource is NULL on bleed out");
             downButNotOut$cleanupDownedEntities();
         }
     }
 
     @Override
     public void downButNotOut$applyDowned(DamageSource damageSource) {
-        this.setHealth(DownButNotOut.HEARTS_AFTER_REVIVE);
-        this.addCommandTag(DownButNotOut.DOWNED_TAG);
+        this.setHealth(Reference.HEARTS_AFTER_REVIVE);
+        this.addCommandTag(Reference.DOWNED_TAG);
         this.setInvulnerable(true);
         this.changeGameMode(GameMode.ADVENTURE);
         if (ModConfig.INSTANCE.DOWNED_PLAYERS_HAVE_GLOW_EFFECT) {
@@ -157,7 +159,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
         moveSpeed.setBaseValue(ModConfig.INSTANCE.DOWNED_MOVE_SPEED);
 
         this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ENTITY_TURTLE_EGG_BREAK,
-                SoundCategory.PLAYERS, ModConfig.INSTANCE.DOWNED_SOUND_VOLUME, DownButNotOut.DOWNED_SOUND_PITCH);
+                SoundCategory.PLAYERS, ModConfig.INSTANCE.DOWNED_SOUND_VOLUME, Reference.DOWNED_SOUND_PITCH);
 
         // set a bleed out timer (original damageSource will be used for the death)
         // message and statistics
@@ -176,28 +178,24 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Pl
             this.bleedOutTimer.setPlayer(null);
             this.bleedOutTimer = null;
         }
-        this.removeCommandTag(DownButNotOut.DOWNED_TAG);
+        this.removeCommandTag(Reference.DOWNED_TAG);
         this.setInvulnerable(false);
         this.changeGameMode(GameMode.SURVIVAL);
         this.setGlowing(false);
         EntityAttributeInstance moveSpeed = this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
-        moveSpeed.setBaseValue(DownButNotOut.BASE_MOVE_SPEED);
+        moveSpeed.setBaseValue(Reference.BASE_MOVE_SPEED);
         this.removeStatusEffect(StatusEffects.DARKNESS);
         this.removeStatusEffect(StatusEffects.SLOWNESS);
         downButNotOut$cleanupDownedEntities();
     }
 
-    @Override
-    public boolean downButNotOut$isDowned() {
-        return this.getCommandTags().contains(DownButNotOut.DOWNED_TAG);
-    }
 
     @Override
     public void downButNotOut$revive() {
         this.downButNotOut$cancelReviving(this.reviveTimer);
         this.bleedOutTimer.setTicksUntilBleedOut(ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS);
         this.getEntityWorld().playSoundFromEntity(null, this, SoundEvents.ITEM_TRIDENT_RETURN,
-                SoundCategory.PLAYERS, ModConfig.INSTANCE.REVIVED_SOUND_VOLUME, DownButNotOut.REVIVED_SOUND_PITCH);
+                SoundCategory.PLAYERS, ModConfig.INSTANCE.REVIVED_SOUND_VOLUME, Reference.REVIVED_SOUND_PITCH);
         this.downButNotOut$removeDowned();
     }
 
