@@ -2,8 +2,9 @@ package com.phasmoware.down_but_not_out.timer;
 
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
+import com.phasmoware.down_but_not_out.handler.MessageHandler;
 import com.phasmoware.down_but_not_out.manager.DownedStateManager;
-import com.phasmoware.down_but_not_out.util.Reference;
+import com.phasmoware.down_but_not_out.util.Constants;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -14,7 +15,6 @@ public class ReviveTimer {
     private boolean interactionActive = false;
     private long interactionTicks;
     private long counter;
-    private long fiveTickCounter = 0;
     private ServerPlayerEntity reviver;
     private ServerPlayerEntity downed;
 
@@ -27,12 +27,8 @@ public class ReviveTimer {
     public void tick() {
         if (reviver != null && downed != null) {
             counter++;
-            fiveTickCounter++;
             if (interactionActive) {
-                if (fiveTickCounter >= 5) {
-                    doEveryFiveTicks();
-
-                }
+                updateReviveProgress();
                 incrementInteractionTicks();
             }
             if (isValidReviver(this.reviver, this.downed)) {
@@ -62,27 +58,26 @@ public class ReviveTimer {
             return false;
         }
         if (!reviver.getMainHandStack().isEmpty()) {
-            Text msgToReviver = Text.literal("Use a hand to revive them!").formatted(Formatting.RED);
-            reviver.sendMessage(msgToReviver, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+            Text msgToReviver = Text.literal("Use a free hand to revive them!").formatted(Formatting.RED);
+            MessageHandler.sendUpdateMessage(msgToReviver, reviver);
             return false;
         }
         if ((reviver.squaredDistanceTo(downed) > reviver.getEntityInteractionRange() + 1.5)) {
             Text msgToReviver = Text.literal("Too far away to revive them!").formatted(Formatting.RED);
-            reviver.sendMessage(msgToReviver, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+            MessageHandler.sendUpdateMessage(msgToReviver, reviver);
             return false;
         }
-        if (!downed.isEntityLookingAtMe(reviver, Reference.CONE_SIZE, Reference.ADJUST_FOR_DISTANCE, Reference.SEE_THROUGH_TRANSPARENT_BLOCKS, new double[]{downed.getY(), downed.getEyeY()})) {
+        if (!downed.isEntityLookingAtMe(reviver, Constants.CONE_SIZE, Constants.ADJUST_FOR_DISTANCE, Constants.SEE_THROUGH_TRANSPARENT_BLOCKS, new double[]{downed.getY(), downed.getEyeY()})) {
             return false;
         }
         return true;
     }
 
-    private void doEveryFiveTicks() {
-        Text msgToReviver = Text.literal("Hold to Revive:" + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
-        reviver.sendMessage(msgToReviver, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+    private void updateReviveProgress() {
+        Text msgToReviver = Text.literal("Hold to Revive: " + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
+        MessageHandler.sendUpdateMessage(msgToReviver, reviver);
         Text msgToDowned = Text.literal("Reviving: " + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
-        downed.sendMessage(msgToDowned, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
-        fiveTickCounter = 0;
+        MessageHandler.sendUpdateMessage(msgToDowned, downed);
     }
 
     public void reset(ServerPlayerEntity reviver) {

@@ -4,7 +4,8 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
-import com.phasmoware.down_but_not_out.util.Reference;
+import com.phasmoware.down_but_not_out.handler.MessageHandler;
+import com.phasmoware.down_but_not_out.util.Constants;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -16,16 +17,16 @@ public class BleedOutCommand implements Command<ServerCommandSource> {
         ServerCommandSource source = context.getSource();
         ServerPlayerEntity player = source.getPlayer();
         if (player == null) {
-            source.sendError(Text.literal("You must be a player to use this command."));
+            MessageHandler.sendErrorMessage(Text.literal("You must be a player to use this command."), source);
             return 1;
 
         }
-        if (!(player.getCommandTags().contains(Reference.DOWNED_TAG))) {
-            source.sendError(Text.literal("You are not in a downed state."));
+        if (!(player.getCommandTags().contains(Constants.DOWNED_TAG))) {
+            MessageHandler.sendErrorMessage(Text.literal("You are not in a downed state."), source);
             return 1;
         }
         if (((ServerPlayerAPI)player).downButNotOut$getBleedOutTimer() == null) {
-            source.sendError(Text.literal("No BleedOut Timer has been set."));
+            MessageHandler.sendErrorMessage(Text.literal("No BleedOut Timer has been set."), source);
             return 1;
         }
 

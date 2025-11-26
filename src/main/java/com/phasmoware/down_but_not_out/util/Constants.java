@@ -4,7 +4,7 @@ import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Reference {
+public class Constants {
     public static final String MOD_ID = "down_but_not_out";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final float HEARTS_AFTER_REVIVE = 0.01f;

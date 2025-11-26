@@ -4,7 +4,7 @@ import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.manager.DownedStateManager;
 import com.phasmoware.down_but_not_out.util.DownedUtility;
-import com.phasmoware.down_but_not_out.util.Reference;
+import com.phasmoware.down_but_not_out.util.Constants;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -42,8 +42,8 @@ public class EventCallbackHandler {
 
         if (ModConfig.INSTANCE.SKIP_DOWNED_STATE_IF_NO_OTHER_PLAYERS_ONLINE
                 && player.getEntityWorld().getServer().getCurrentPlayerCount() <= 1) {
-            player.sendMessage(Text.literal(Reference.SKIPPED_DOWNED_STATE_MSG).formatted(Formatting.RED),
-                    ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+            Text skippedDownedStateMessage = Text.literal(Constants.SKIPPED_DOWNED_STATE_MSG).formatted(Formatting.RED);
+            MessageHandler.sendUpdateMessage(skippedDownedStateMessage, player);
             return true;
         }
 

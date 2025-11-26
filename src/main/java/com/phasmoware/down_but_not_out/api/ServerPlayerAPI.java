@@ -5,6 +5,7 @@ import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 
 public interface ServerPlayerAPI {
 
@@ -29,5 +30,9 @@ public interface ServerPlayerAPI {
     ArmorStandEntity downButNotOut$getInvisibleArmorStandEntity();
 
     void downButNotOut$setInvisibleArmorStandEntity(ArmorStandEntity armorStandEntity);
+
+    Text downButNotOut$getLastText();
+
+    void downButNotOut$setLastText(Text lastText);
 
 }

@@ -26,13 +26,13 @@ public class DownedUtility {
     public static void bleedOut(ServerPlayerEntity player, DamageSource damageSource) {
         player.setInvulnerable(false);
         if (damageSource != null) {
-            player.damage(player.getEntityWorld(), damageSource, Reference.PLAYER_MAX_HEALTH); // should not survive
+            player.damage(player.getEntityWorld(), damageSource, Constants.PLAYER_MAX_HEALTH); // should not survive
             if (!player.isDead()) {
                 player.kill(player.getEntityWorld());
             }
         } else {
             player.kill(player.getEntityWorld());
-            Reference.LOGGER.warn(player.getName() + "'s DamageSource is NULL on bleed out");
+            Constants.LOGGER.warn(player.getName() + "'s DamageSource is NULL on bleed out");
         }
     }
 
@@ -40,34 +40,34 @@ public class DownedUtility {
         if (player == null) {
             return false;
         }
-        return player.getCommandTags().contains(Reference.DOWNED_TAG);
+        return player.getCommandTags().contains(Constants.DOWNED_TAG);
     }
 
     public static boolean isDowned(PlayerEntity player) {
         if (player == null) {
             return false;
         }
-        return player.getCommandTags().contains(Reference.DOWNED_TAG);
+        return player.getCommandTags().contains(Constants.DOWNED_TAG);
     }
 
     public static boolean isDowned(LivingEntity player) {
         if (player == null) {
             return false;
         }
-        return player.getCommandTags().contains(Reference.DOWNED_TAG);
+        return player.getCommandTags().contains(Constants.DOWNED_TAG);
     }
 
     public static boolean isDowned(Entity player) {
         if (player == null) {
             return false;
         }
-        return player.getCommandTags().contains(Reference.DOWNED_TAG);
+        return player.getCommandTags().contains(Constants.DOWNED_TAG);
     }
 
     public static void applyDownedState(ServerPlayerEntity player) {
         if (player != null) {
-            player.setHealth(Reference.HEARTS_AFTER_REVIVE);
-            player.addCommandTag(Reference.DOWNED_TAG);
+            player.setHealth(Constants.HEARTS_AFTER_REVIVE);
+            player.addCommandTag(Constants.DOWNED_TAG);
             player.setInvulnerable(true);
             player.changeGameMode(GameMode.ADVENTURE);
             if (ModConfig.INSTANCE.DOWNED_PLAYERS_HAVE_GLOW_EFFECT) {
@@ -80,22 +80,22 @@ public class DownedUtility {
             EntityAttributeInstance moveSpeed = player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
             moveSpeed.setBaseValue(ModConfig.INSTANCE.DOWNED_MOVE_SPEED);
         } else {
-            Reference.LOGGER.error("Error: Can't apply downed state because player is null!");
+            Constants.LOGGER.error("Error: Can't apply downed state because player is null!");
         }
     }
 
     public static void removeDownedState(ServerPlayerEntity player) {
         if (player != null) {
-            player.removeCommandTag(Reference.DOWNED_TAG);
+            player.removeCommandTag(Constants.DOWNED_TAG);
             player.setInvulnerable(false);
             player.changeGameMode(GameMode.SURVIVAL);
             player.setGlowing(false);
             EntityAttributeInstance moveSpeed = player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
-            moveSpeed.setBaseValue(Reference.BASE_MOVE_SPEED);
+            moveSpeed.setBaseValue(Constants.BASE_MOVE_SPEED);
             player.removeStatusEffect(StatusEffects.DARKNESS);
             player.removeStatusEffect(StatusEffects.SLOWNESS);
         } else {
-            Reference.LOGGER.error("Error: Can't remove downed state because player is null!");
+            Constants.LOGGER.error("Error: Can't remove downed state because player is null!");
         }
     }
 
@@ -109,7 +109,7 @@ public class DownedUtility {
         ((ArmorStandEntityAccessor) armorStand).invokeSetMarker(true);
         ((ArmorStandEntityAccessor) armorStand).invokeSetSmall(true);
         EntityAttributeInstance armorStandScale = armorStand.getAttributeInstance(EntityAttributes.SCALE);
-        armorStandScale.setBaseValue(Reference.MIN_ENTITY_SCALE);
+        armorStandScale.setBaseValue(Constants.MIN_ENTITY_SCALE);
         world.spawnEntity(armorStand);
         return armorStand;
     }
@@ -123,7 +123,7 @@ public class DownedUtility {
         shulkerEntity.setCustomNameVisible(false);
 
         EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
-        attributeInstance.setBaseValue(Reference.MIN_ENTITY_SCALE);
+        attributeInstance.setBaseValue(Constants.MIN_ENTITY_SCALE);
 
         StatusEffectInstance instance = new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false);
         shulkerEntity.addStatusEffect(instance);

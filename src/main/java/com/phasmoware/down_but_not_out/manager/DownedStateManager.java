@@ -2,16 +2,14 @@ package com.phasmoware.down_but_not_out.manager;
 
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.config.ModConfig;
-import com.phasmoware.down_but_not_out.handler.SendMessageHandler;
+import com.phasmoware.down_but_not_out.handler.MessageHandler;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import com.phasmoware.down_but_not_out.util.DownedUtility;
-import com.phasmoware.down_but_not_out.util.Reference;
+import com.phasmoware.down_but_not_out.util.Constants;
 import com.phasmoware.down_but_not_out.util.SoundUtility;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -25,8 +23,8 @@ public class DownedStateManager {
         }
         DownedUtility.removeDownedState(player);
         DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI) player);
-        player.sendMessage(Text.literal(Reference.BLED_OUT_MSG).formatted(Formatting.RED),
-                ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+        Text bledOutMessage = Text.literal(Constants.BLED_OUT_MSG).formatted(Formatting.RED);
+        MessageHandler.sendUpdateMessage(bledOutMessage, player);
     }
 
     public static void onPlayerDownedEvent(ServerPlayerEntity player, DamageSource damageSource) {
@@ -42,11 +40,10 @@ public class DownedStateManager {
 
         DownedUtility.setInvisibleShulkerArmorStandRider((ServerPlayerAPI) player, player.getEntityWorld());
 
-        SendMessageHandler.broadcastMessageToPlayers(player.getName().getLiteralString() + Reference.DOWNED_STATE_MSG,
+        MessageHandler.broadcastMessageToPlayers(player.getName().getLiteralString() + Constants.DOWNED_STATE_MSG,
                 player.getEntityWorld(), Formatting.RED);
 
-        player.sendMessage(Text.literal("[Click here to give up] or use command /bleedout").setStyle(Style.EMPTY.withUnderline(true)
-                .withBold(true).withClickEvent(new ClickEvent.RunCommand("bleedout"))), false);
+        MessageHandler.sendClickableGiveUpMessage(player);
     }
 
     public static void onBleedOutEvent(ServerPlayerEntity player, DamageSource damageSource) {
@@ -55,7 +52,7 @@ public class DownedStateManager {
     }
 
     public static void onReviveEvent(ServerPlayerEntity player, ServerPlayerEntity reviver) {
-        SendMessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() + Reference.REVIVED_MSG +
+        MessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() + Constants.REVIVED_MSG +
                 player.getName().getLiteralString(), player.getEntityWorld(), Formatting.GREEN);
         ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
         serverPlayer.downButNotOut$cancelReviving(serverPlayer.downButNotOut$getReviveTimer());

@@ -2,7 +2,7 @@ package com.phasmoware.down_but_not_out.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.phasmoware.down_but_not_out.util.Reference;
+import com.phasmoware.down_but_not_out.util.Constants;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.File;
@@ -35,7 +35,7 @@ public final class ConfigUtility {
             File file = requestConfigFile();
             return GSON.fromJson(Files.readString(file.toPath()),  ModConfig.class);
         } catch (IOException e) {
-            Reference.LOGGER.error("Config file request failed!", e);
+            Constants.LOGGER.error("Config file request failed!", e);
             throw new RuntimeException(e);
         }
     }
@@ -44,7 +44,7 @@ public final class ConfigUtility {
         try {
             Files.writeString(filePath, GSON.toJson(config));
         } catch (IOException e) {
-            Reference.LOGGER.error("Saving default config file failed!", e);
+            Constants.LOGGER.error("Saving default config file failed!", e);
         }
     }
 }

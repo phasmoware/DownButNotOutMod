@@ -6,13 +6,13 @@ import com.phasmoware.down_but_not_out.manager.DownedStateManager;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import com.phasmoware.down_but_not_out.util.DownedUtility;
-import com.phasmoware.down_but_not_out.util.Reference;
+import com.phasmoware.down_but_not_out.util.Constants;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -41,6 +41,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
     @Unique
     private boolean isBeingRevived;
 
+    @Unique
+    private Text lastText;
+
     @Shadow
     public abstract ServerWorld getEntityWorld();
 
@@ -63,7 +66,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
 
             // keep an invisible ShulkerEntity riding an ArmorStandEntity at player's head to force crawling pose
             // (server side workaround)
-            if (!this.getVelocity().equals(Reference.DOWNED_NOT_MOVING)) {
+            if (!this.getVelocity().equals(Constants.DOWNED_NOT_MOVING)) {
                 DownedUtility.forceCrawlPose(this);
             }
         }
@@ -126,6 +129,16 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
     @Override
     public void downButNotOut$setInvisibleArmorStandEntity(ArmorStandEntity armorStandEntity) {
         this.invisibleArmorStandEntity = armorStandEntity;
+    }
+
+    @Override
+    public Text downButNotOut$getLastText() {
+        return this.lastText;
+    }
+
+    @Override
+    public void downButNotOut$setLastText(Text lastText) {
+        this.lastText = lastText;
     }
 
 }
