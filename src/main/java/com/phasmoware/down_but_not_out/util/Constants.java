@@ -15,6 +15,7 @@ public class Constants {
     public static final boolean ADJUST_FOR_DISTANCE = true;
     public static final boolean SEE_THROUGH_TRANSPARENT_BLOCKS = true;
     public static final String SKIPPED_DOWNED_STATE_MSG = "No one was available to revive you...";
+    public static final String LAVA_PREVENTED_DOWNED_MSG = "The lava prevented you from being downed...";
     public static final String DOWNED_STATE_MSG = " is down, give them a hand to revive them";
     public static final String REVIVED_MSG = " has revived ";
     public static final String BLED_OUT_MSG = "You bled out...";

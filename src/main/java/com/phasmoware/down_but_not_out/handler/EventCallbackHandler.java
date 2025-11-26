@@ -4,15 +4,12 @@ import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.manager.DownedStateManager;
 import com.phasmoware.down_but_not_out.util.DownedUtility;
-import com.phasmoware.down_but_not_out.util.Constants;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
@@ -26,27 +23,22 @@ public class EventCallbackHandler {
         if (!ModConfig.INSTANCE.MOD_ENABLED) {
             return true;
         }
-
         if (!(entity instanceof ServerPlayerEntity player)) {
             return true;
         }
-
         if (isDowned(player)) {
             DownedStateManager.onDeathEventOfDownedPlayer(player, damageSource);
             return true;
         }
-
         if (player.isInLava() && player.isOnFire() && !ModConfig.INSTANCE.ALLOW_DOWNED_STATE_IN_LAVA) {
+            DownedStateManager.onPlayerDownedInLava(player);
             return true;
         }
-
         if (ModConfig.INSTANCE.SKIP_DOWNED_STATE_IF_NO_OTHER_PLAYERS_ONLINE
                 && player.getEntityWorld().getServer().getCurrentPlayerCount() <= 1) {
-            Text skippedDownedStateMessage = Text.literal(Constants.SKIPPED_DOWNED_STATE_MSG).formatted(Formatting.RED);
-            MessageHandler.sendUpdateMessage(skippedDownedStateMessage, player);
+            DownedStateManager.onPlayerDownedInEmptyServer(player);
             return true;
         }
-
         // else prevent death and apply downed state instead
         DownedStateManager.onPlayerDownedEvent(player, damageSource);
         return false;

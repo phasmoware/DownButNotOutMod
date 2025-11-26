@@ -15,6 +15,7 @@ import net.minecraft.util.Formatting;
 
 public class DownedStateManager {
 
+
     public static void onDeathEventOfDownedPlayer(ServerPlayerEntity player, DamageSource damageSource) {
         ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
         if (serverPlayer.downButNotOut$getBleedOutTimer() != null) {
@@ -44,6 +45,11 @@ public class DownedStateManager {
                 player.getEntityWorld(), Formatting.RED);
 
         MessageHandler.sendClickableGiveUpMessage(player);
+    }
+
+    public static void onPlayerDownedInEmptyServer(ServerPlayerEntity player) {
+        Text skippedDownedStateMessage = Text.literal(Constants.SKIPPED_DOWNED_STATE_MSG).formatted(Formatting.RED);
+        MessageHandler.sendUpdateMessage(skippedDownedStateMessage, player);
     }
 
     public static void onBleedOutEvent(ServerPlayerEntity player, DamageSource damageSource) {
@@ -79,5 +85,10 @@ public class DownedStateManager {
         } else if (DownedUtility.playerIsGettingRevivedBy(downed, reviver)) {
             reviveTimer.startReviveInteraction();
         }
+    }
+
+    public static void onPlayerDownedInLava(ServerPlayerEntity player) {
+        Text skippedDownedStateMessage = Text.literal(Constants.LAVA_PREVENTED_DOWNED_MSG).formatted(Formatting.RED);
+        MessageHandler.sendUpdateMessage(skippedDownedStateMessage, player);
     }
 }
