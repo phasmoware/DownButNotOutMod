@@ -1,6 +1,5 @@
 package com.phasmoware.down_but_not_out.timer;
 
-import com.phasmoware.down_but_not_out.DownButNotOut;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -28,20 +27,19 @@ public class BleedOutTimer implements ServerTickEvents.EndTick {
     @Override
     public void onEndTick(MinecraftServer minecraftServer) {
         if (this.player != null) {
-            if (((PlayerDownButNotOut)player).downButNotOut$isDowned()) {
+            if (((PlayerDownButNotOut) player).downButNotOut$isDowned()) {
                 tickHeartbeats();
-                if (!((PlayerDownButNotOut)player).downButNotOut$isBeingRevived()) {
+                if (!((PlayerDownButNotOut) player).downButNotOut$isBeingRevived()) {
                     if (this.ticksUntilBleedOut > 0L) {
                         --this.ticksUntilBleedOut;
                         if (this.ticksUntilBleedOut == 0L) {
-                            ((PlayerDownButNotOut)player).downButNotOut$bleedOut(this.damageSource);
+                            ((PlayerDownButNotOut) player).downButNotOut$bleedOut(this.damageSource);
                         }
                     }
                 }
             }
         } else {
             this.damageSource = null;
-            DownButNotOut.LOGGER.info("BleedOutTimer player is null!");
         }
     }
 
@@ -77,7 +75,7 @@ public class BleedOutTimer implements ServerTickEvents.EndTick {
         // pitch slows down heartbeat as bleed out timer progresses
         float pitch = Math.max(0f, 1f - getCurrentProgress());
         this.player.getEntityWorld().playSoundFromEntity(null, this.player, SoundEvents.ENTITY_WARDEN_HEARTBEAT,
-                    SoundCategory.PLAYERS, ModConfig.INSTANCE.HEARTBEAT_SOUND_VOLUME, pitch);
+                SoundCategory.PLAYERS, ModConfig.INSTANCE.HEARTBEAT_SOUND_VOLUME, pitch);
     }
 
     public void register() {

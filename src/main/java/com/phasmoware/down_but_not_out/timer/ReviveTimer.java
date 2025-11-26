@@ -6,9 +6,11 @@ import com.phasmoware.down_but_not_out.duck.PlayerDownButNotOut;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 public class ReviveTimer implements ServerTickEvents.EndTick {
+    private boolean interactionActive = false;
     private long interactionTicks;
     private long counter;
     private ServerPlayerEntity reviver;
@@ -22,15 +24,24 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
 
     @Override
     public void onEndTick(MinecraftServer minecraftServer) {
-        counter++;
-        if (isValidReviver(this.reviver, this.downed)) {
-            if (this.interactionTicks >= ModConfig.INSTANCE.REVIVE_DURATION_TICKS) {
-                DownButNotOut.broadcastMessageToPlayers(reviver.getName().getLiteralString() + DownButNotOut.REVIVED_MSG +
-                        downed.getName().getLiteralString(), downed.getEntityWorld(), Formatting.GREEN);
-                ((PlayerDownButNotOut)this.downed).downButNotOut$revive();
+        if (reviver != null && downed != null) {
+            counter++;
+            if (interactionActive) {
+                Text msgToReviver = Text.literal("Hold to Revive:" + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
+                reviver.sendMessage(msgToReviver, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+                Text msgToDowned = Text.literal("Reviving: " + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
+                downed.sendMessage(msgToDowned, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+                incrementInteractionTicks();
+            }
+            if (isValidReviver(this.reviver, this.downed)) {
+                if (this.interactionTicks >= ModConfig.INSTANCE.REVIVE_DURATION_TICKS) {
+                    DownButNotOut.broadcastMessageToPlayers(reviver.getName().getLiteralString() + DownButNotOut.REVIVED_MSG +
+                            downed.getName().getLiteralString(), downed.getEntityWorld(), Formatting.GREEN);
+                    ((PlayerDownButNotOut)this.downed).downButNotOut$revive();
 
-            } else if ((counter - 10) > interactionTicks) {
-                ((PlayerDownButNotOut)this.downed).downButNotOut$cancelReviving(this);
+                } else if ((counter - 10) > interactionTicks) {
+                    ((PlayerDownButNotOut)this.downed).downButNotOut$cancelReviving(this);
+                }
             }
         }
     }
@@ -52,13 +63,19 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
         if (!((PlayerDownButNotOut)downed).downButNotOut$isDowned()) {
             return false;
         }
-        /*if (reviver.isUsingItem()) {
+        if (!reviver.getMainHandStack().isEmpty()) {
+            Text msgToReviver = Text.literal("Use a hand to revive them!").formatted(Formatting.RED);
+            reviver.sendMessage(msgToReviver, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
             return false;
-        }*/
-        /*if (!downed.isEntityLookingAtMe(reviver, DownButNotOut.CONE_SIZE, DownButNotOut.ADJUST_FOR_DISTANCE, DownButNotOut.SEE_THROUGH_TRANSPARENT_BLOCKS)) {
+        }
+        if ((reviver.squaredDistanceTo(downed) > reviver.getEntityInteractionRange() + 1.5)) {
+            Text msgToReviver = Text.literal("Too far away to revive them!").formatted(Formatting.RED);
+            reviver.sendMessage(msgToReviver, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
             return false;
-        }*/
-
+        }
+        if (!downed.isEntityLookingAtMe(reviver, DownButNotOut.CONE_SIZE, DownButNotOut.ADJUST_FOR_DISTANCE, DownButNotOut.SEE_THROUGH_TRANSPARENT_BLOCKS, new double[]{downed.getY(), downed.getY() + 0.25})) {
+            return false;
+        }
         return true;
     }
 
@@ -82,6 +99,8 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
     public void incrementInteractionTicks() {
         if (isValidReviver(this.reviver, this.downed)) {
             this.interactionTicks++;
+        } else {
+            this.interactionActive = false;
         }
     }
 
@@ -99,5 +118,9 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
 
     public void setDowned(ServerPlayerEntity downed) {
         this.downed = downed;
+    }
+
+    public void startReviveInteraction() {
+        this.interactionActive = true;
     }
 }

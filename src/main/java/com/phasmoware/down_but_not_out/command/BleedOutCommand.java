@@ -29,7 +29,7 @@ public class BleedOutCommand implements Command<ServerCommandSource> {
             return 1;
         }
 
-        // Set ticks until bleed out to 1 to bleed out next tick
+        // set ticks until bleed out to 1 to bleed out next tick
         ((PlayerDownButNotOut)player).downButNotOut$getBleedOutTimer().setTicksUntilBleedOut(1);
 
         return 0;

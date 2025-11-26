@@ -13,7 +13,7 @@ import java.nio.file.Path;
 public final class ConfigUtility {
 
     private static final String CONF_DIR = "DownButNotOut";
-    private static final String CONF_FILE = "config.json5";
+    private static final String CONF_FILE = "config.json";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path GLOBAL_CONF_PATH = FabricLoader.getInstance().getConfigDir();
 

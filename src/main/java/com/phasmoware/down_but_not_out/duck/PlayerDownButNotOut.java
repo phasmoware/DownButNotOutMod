@@ -8,7 +8,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 public interface PlayerDownButNotOut {
 
-
     void downButNotOut$bleedOut(DamageSource damageSource);
 
     void downButNotOut$applyDowned(DamageSource damageSource);
@@ -30,6 +29,8 @@ public interface PlayerDownButNotOut {
     BleedOutTimer downButNotOut$getBleedOutTimer();
 
     ReviveTimer downButNotOut$getReviveTimer();
+
+    void downButNotOut$cleanupDownedEntities();
 
     ShulkerEntity downButNotOut$getInvisibleShulkerEntity();
 

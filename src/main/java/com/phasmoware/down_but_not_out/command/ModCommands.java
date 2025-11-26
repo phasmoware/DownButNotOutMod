@@ -14,14 +14,16 @@ public class ModCommands {
 
     public static void initialize() {
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated, environment) -> {
-            //Make some new nodes
-            LiteralCommandNode<ServerCommandSource> killNode = CommandManager
+            // build new nodes
+            LiteralCommandNode<ServerCommandSource> bleedOutNode = CommandManager
                     .literal("bleedout")
                     .executes(new BleedOutCommand())
                     .build();
 
-            //usage: /bleedout
-            dispatcher.getRoot().addChild(killNode);
+
+            // usage: /bleedout
+            dispatcher.getRoot().addChild(bleedOutNode);
+
         });
     }
 
