@@ -6,11 +6,13 @@ import com.phasmoware.down_but_not_out.manager.DownedStateManager;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import com.phasmoware.down_but_not_out.util.DownedUtility;
+import com.phasmoware.down_but_not_out.util.Reference;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -61,7 +63,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
 
             // keep an invisible ShulkerEntity riding an ArmorStandEntity at player's head to force crawling pose
             // (server side workaround)
-            DownedUtility.forceCrawlPose(this);
+            if (!this.getVelocity().equals(Reference.DOWNED_NOT_MOVING)) {
+                DownedUtility.forceCrawlPose(this);
+            }
         }
     }
 

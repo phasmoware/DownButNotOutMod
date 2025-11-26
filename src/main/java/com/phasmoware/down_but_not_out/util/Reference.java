@@ -1,5 +1,6 @@
 package com.phasmoware.down_but_not_out.util;
 
+import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,4 +21,6 @@ public class Reference {
     public static final float REVIVED_SOUND_PITCH = 0.6F;
     public static final double MIN_ENTITY_SCALE = 0.0625d;
     public static final float PLAYER_MAX_HEALTH = 1024.5f;
+    public static final double DOWN_FORCE = -0.0784000015258789;
+    public static final Vec3d DOWNED_NOT_MOVING =  new Vec3d(0.0D, DOWN_FORCE, 0.0D);
 }

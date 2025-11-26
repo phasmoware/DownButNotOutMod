@@ -14,6 +14,7 @@ public class ReviveTimer {
     private boolean interactionActive = false;
     private long interactionTicks;
     private long counter;
+    private long fiveTickCounter = 0;
     private ServerPlayerEntity reviver;
     private ServerPlayerEntity downed;
 
@@ -26,11 +27,12 @@ public class ReviveTimer {
     public void tick() {
         if (reviver != null && downed != null) {
             counter++;
+            fiveTickCounter++;
             if (interactionActive) {
-                Text msgToReviver = Text.literal("Hold to Revive:" + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
-                reviver.sendMessage(msgToReviver, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
-                Text msgToDowned = Text.literal("Reviving: " + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
-                downed.sendMessage(msgToDowned, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+                if (fiveTickCounter >= 5) {
+                    doEveryFiveTicks();
+
+                }
                 incrementInteractionTicks();
             }
             if (isValidReviver(this.reviver, this.downed)) {
@@ -73,6 +75,14 @@ public class ReviveTimer {
             return false;
         }
         return true;
+    }
+
+    private void doEveryFiveTicks() {
+        Text msgToReviver = Text.literal("Hold to Revive:" + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
+        reviver.sendMessage(msgToReviver, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+        Text msgToDowned = Text.literal("Reviving: " + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
+        downed.sendMessage(msgToDowned, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+        fiveTickCounter = 0;
     }
 
     public void reset(ServerPlayerEntity reviver) {
