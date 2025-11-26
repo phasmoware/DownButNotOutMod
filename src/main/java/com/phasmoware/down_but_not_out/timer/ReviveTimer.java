@@ -1,20 +1,16 @@
 package com.phasmoware.down_but_not_out.timer;
 
-import com.phasmoware.down_but_not_out.DownButNotOut;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
-import com.phasmoware.down_but_not_out.handler.SendMessageHandler;
 import com.phasmoware.down_but_not_out.manager.DownedStateManager;
 import com.phasmoware.down_but_not_out.util.Reference;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
 
-public class ReviveTimer implements ServerTickEvents.EndTick {
+public class ReviveTimer {
     private boolean interactionActive = false;
     private long interactionTicks;
     private long counter;
@@ -27,8 +23,7 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
     }
 
 
-    @Override
-    public void onEndTick(MinecraftServer minecraftServer) {
+    public void tick() {
         if (reviver != null && downed != null) {
             counter++;
             if (interactionActive) {
@@ -50,9 +45,6 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
         }
     }
 
-    public void register() {
-        ServerTickEvents.END_SERVER_TICK.register(this);
-    }
 
     public boolean isValidReviver(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
         if (reviver == null || downed == null) {

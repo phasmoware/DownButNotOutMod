@@ -6,7 +6,7 @@
   "mixins": [
   ],
   "server": [
-    "ServerServerPlayerEntityMixin",
+    "ServerPlayerEntityMixin",
     "ArmorStandEntityAccessor"
   ],
   "injectors": {

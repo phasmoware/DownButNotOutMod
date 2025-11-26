@@ -38,7 +38,6 @@ public class DownedStateManager {
         // message and statistics
         if (serverPlayer.downButNotOut$getBleedOutTimer() == null) {
            serverPlayer.downButNotOut$setBleedOutTimer(new BleedOutTimer(ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS, player, damageSource));
-            serverPlayer.downButNotOut$getBleedOutTimer().register();
         }
 
         DownedUtility.setInvisibleShulkerArmorStandRider((ServerPlayerAPI) player, player.getEntityWorld());
@@ -71,7 +70,6 @@ public class DownedStateManager {
         if (!DownedUtility.playerIsGettingRevivedBy(downed, reviver)) {
             if (reviveTimer == null) {
                 reviveTimer = new ReviveTimer(reviver, downed);
-                reviveTimer.register();
                 ((ServerPlayerAPI) downed).downButNotOut$startReviving(reviveTimer, reviver);
                 reviveTimer.startReviveInteraction();
             } else if (reviveTimer.getReviver() != null

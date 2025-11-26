@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerServerPlayerEntityMixin extends PlayerEntity implements ServerPlayerAPI {
+public abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerPlayerAPI {
 
     @Unique
     private BleedOutTimer bleedOutTimer;
@@ -42,7 +42,7 @@ public abstract class ServerServerPlayerEntityMixin extends PlayerEntity impleme
     @Shadow
     public abstract ServerWorld getEntityWorld();
 
-    public ServerServerPlayerEntityMixin(World world, GameProfile profile) {
+    public ServerPlayerEntityMixin(World world, GameProfile profile) {
         super(world, profile);
     }
 
@@ -52,7 +52,13 @@ public abstract class ServerServerPlayerEntityMixin extends PlayerEntity impleme
             // if player has command tag but not in downed state
             if (this.bleedOutTimer == null) {
                 DownedStateManager.onPlayerDownedEvent((ServerPlayerEntity) (Object) this, null);
+            } else {
+                bleedOutTimer.tick();
             }
+            if (reviveTimer != null) {
+                reviveTimer.tick();
+            }
+
             // keep an invisible ShulkerEntity riding an ArmorStandEntity at player's head to force crawling pose
             // (server side workaround)
             DownedUtility.forceCrawlPose(this);
