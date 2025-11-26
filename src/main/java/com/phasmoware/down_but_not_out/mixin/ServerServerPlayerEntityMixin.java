@@ -87,15 +87,15 @@ public abstract class ServerServerPlayerEntityMixin extends PlayerEntity impleme
 
     @Override
     public void downButNotOut$applyDowned(DamageSource damageSource) {
-        DownedUtility.applyDownedState((ServerPlayerEntity) (Object) this);
+        ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
+        DownedUtility.applyDownedState(player);
 
-        SoundUtility.playDownedSound((ServerPlayerEntity) (Object) this);
+        SoundUtility.playDownedSound(player);
 
         // set a bleed out timer (original damageSource will be used for the death)
         // message and statistics
         if (this.bleedOutTimer == null) {
-            this.bleedOutTimer = new BleedOutTimer(ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS,
-                    (ServerPlayerEntity) (Object) this, damageSource);
+            this.bleedOutTimer = new BleedOutTimer(ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS, player, damageSource);
             this.bleedOutTimer.register();
         }
 
