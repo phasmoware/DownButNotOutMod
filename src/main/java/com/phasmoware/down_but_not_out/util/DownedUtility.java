@@ -4,6 +4,7 @@ import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.mixin.ArmorStandEntityAccessor;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
@@ -16,6 +17,8 @@ import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 
 public class DownedUtility {
@@ -146,5 +149,36 @@ public class DownedUtility {
             player.downButNotOut$getInvisibleArmorStandEntity().remove(Entity.RemovalReason.DISCARDED);
             player.downButNotOut$setInvisibleArmorStandEntity(null);
         }
+    }
+
+    public static void forceCrawlPose(ServerPlayerAPI serverPlayer) {
+        ServerPlayerEntity player = (ServerPlayerEntity) serverPlayer;
+        player.setPose(EntityPose.SWIMMING);
+        Vec3d headPosition = new Vec3d(player.getX(), player.getY(), player.getZ()).offset(Direction.UP, 1);
+        if (!player.isInFluid()) {
+            if (serverPlayer.downButNotOut$getInvisibleArmorStandEntity() != null && !serverPlayer.downButNotOut$getInvisibleArmorStandEntity().isRemoved()) {
+                serverPlayer.downButNotOut$getInvisibleArmorStandEntity().setPosition(headPosition.x, headPosition.y, headPosition.z);
+            } else if (serverPlayer.downButNotOut$getInvisibleShulkerEntity() == null || serverPlayer.downButNotOut$getInvisibleShulkerEntity().isRemoved()) {
+                DownedUtility.setInvisibleShulkerArmorStandRider(serverPlayer, player.getEntityWorld());
+            }
+        }
+    }
+
+    public static boolean playerIsGettingRevivedBy(ServerPlayerEntity downed, ServerPlayerEntity reviver) {
+        ServerPlayerAPI downedPlayer = (ServerPlayerAPI) downed;
+
+        if (downedPlayer.downButNotOut$getReviveTimer() == null) {
+            return false;
+        }
+        if (reviver == null) {
+            return false;
+        }
+        if (!(downedPlayer.downButNotOut$getReviveTimer().getReviver().equals(reviver))) {
+            return false;
+        }
+        if (!(downedPlayer.downButNotOut$getReviveTimer().isValidReviver(reviver, downed))) {
+            return false;
+        }
+        return (downedPlayer.downButNotOut$isBeingRevived());
     }
 }

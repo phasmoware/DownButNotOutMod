@@ -2,6 +2,7 @@ package com.phasmoware.down_but_not_out.timer;
 
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
+import com.phasmoware.down_but_not_out.manager.DownedStateManager;
 import com.phasmoware.down_but_not_out.util.SoundUtility;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.damage.DamageSource;
@@ -34,7 +35,7 @@ public class BleedOutTimer implements ServerTickEvents.EndTick {
                     if (this.ticksUntilBleedOut > 0L) {
                         --this.ticksUntilBleedOut;
                         if (this.ticksUntilBleedOut == 0L) {
-                            ((ServerPlayerAPI) player).downButNotOut$bleedOut(this.damageSource);
+                            DownedStateManager.onBleedOutEvent(player, damageSource);
                         }
                     }
                 }

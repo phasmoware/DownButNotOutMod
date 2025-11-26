@@ -2,7 +2,6 @@ package com.phasmoware.down_but_not_out.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.phasmoware.down_but_not_out.DownButNotOut;
 import com.phasmoware.down_but_not_out.util.Reference;
 import net.fabricmc.loader.api.FabricLoader;
 

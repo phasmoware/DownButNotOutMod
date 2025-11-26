@@ -2,7 +2,7 @@ package com.phasmoware.down_but_not_out.handler;
 
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.config.ModConfig;
-import com.phasmoware.down_but_not_out.timer.ReviveTimer;
+import com.phasmoware.down_but_not_out.manager.DownedStateManager;
 import com.phasmoware.down_but_not_out.util.DownedUtility;
 import com.phasmoware.down_but_not_out.util.Reference;
 import net.minecraft.entity.Entity;
@@ -10,8 +10,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
@@ -34,9 +32,7 @@ public class EventCallbackHandler {
         }
 
         if (isDowned(player)) {
-            ((ServerPlayerAPI) player).downButNotOut$removeDowned();
-            player.sendMessage(Text.literal(Reference.BLED_OUT_MSG).formatted(Formatting.RED),
-                    ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+            DownedStateManager.onDeathEventOfDownedPlayer(player, damageSource);
             return true;
         }
 
@@ -52,11 +48,7 @@ public class EventCallbackHandler {
         }
 
         // else prevent death and apply downed state instead
-        ((ServerPlayerAPI) player).downButNotOut$applyDowned(damageSource);
-        SendMessageHandler.broadcastMessageToPlayers(player.getName().getLiteralString() + Reference.DOWNED_STATE_MSG,
-                player.getEntityWorld(), Formatting.RED);
-        player.sendMessage(Text.literal("[Click here to give up]").setStyle(Style.EMPTY.withUnderline(true)
-                .withBold(true).withClickEvent(new ClickEvent.RunCommand("bleedout"))), false);
+        DownedStateManager.onPlayerDownedEvent(player, damageSource);
         return false;
     }
 
@@ -70,30 +62,10 @@ public class EventCallbackHandler {
     public static ActionResult onReviveDownedInteraction(PlayerEntity playerEntity, World world, Hand hand, Entity entity, EntityHitResult entityHitResult) {
         if (isDowned(playerEntity)) {
             return ActionResult.CONSUME;
-        } else if (entity instanceof ServerPlayerEntity targetPlayer
+        } else if (entity instanceof ServerPlayerEntity downed
                 && (isDowned(entity))) {
-
-            ReviveTimer reviveTimer = ((ServerPlayerAPI) targetPlayer).downButNotOut$getReviveTimer();
-            if (!((ServerPlayerAPI) targetPlayer)
-                    .downButNotOut$isBeingRevivedBy((ServerPlayerEntity) playerEntity)) {
-                if (reviveTimer == null) {
-                    reviveTimer = new ReviveTimer((ServerPlayerEntity) playerEntity, targetPlayer);
-                    reviveTimer.register();
-                    ((ServerPlayerAPI) targetPlayer).downButNotOut$startReviving(reviveTimer,
-                            (ServerPlayerEntity) playerEntity);
-                    reviveTimer.startReviveInteraction();
-                } else if (reviveTimer.getReviver() != null
-                        && !(reviveTimer.getReviver().equals(playerEntity))) {
-                    reviveTimer.reset((ServerPlayerEntity) playerEntity);
-                    ((ServerPlayerAPI) targetPlayer).downButNotOut$cancelReviving(reviveTimer);
-                    ((ServerPlayerAPI) targetPlayer).downButNotOut$startReviving(reviveTimer,
-                            (ServerPlayerEntity) playerEntity);
-                    reviveTimer.startReviveInteraction();
-                }
-            } else if (((ServerPlayerAPI) targetPlayer)
-                    .downButNotOut$isBeingRevivedBy((ServerPlayerEntity) playerEntity)) {
-                reviveTimer.startReviveInteraction();
-            }
+            ServerPlayerEntity reviver = (ServerPlayerEntity) playerEntity;
+            DownedStateManager.onReviveInteractionEvent(downed, reviver);
         }
         return ActionResult.PASS;
     }

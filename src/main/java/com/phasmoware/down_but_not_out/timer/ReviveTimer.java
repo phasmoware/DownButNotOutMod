@@ -4,6 +4,7 @@ import com.phasmoware.down_but_not_out.DownButNotOut;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.handler.SendMessageHandler;
+import com.phasmoware.down_but_not_out.manager.DownedStateManager;
 import com.phasmoware.down_but_not_out.util.Reference;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
@@ -39,9 +40,8 @@ public class ReviveTimer implements ServerTickEvents.EndTick {
             }
             if (isValidReviver(this.reviver, this.downed)) {
                 if (this.interactionTicks >= ModConfig.INSTANCE.REVIVE_DURATION_TICKS) {
-                    SendMessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() + Reference.REVIVED_MSG +
-                            downed.getName().getLiteralString(), downed.getEntityWorld(), Formatting.GREEN);
-                    ((ServerPlayerAPI)this.downed).downButNotOut$revive();
+
+                    DownedStateManager.onReviveEvent(downed, reviver);
 
                 } else if ((counter - 10) > interactionTicks) {
                     ((ServerPlayerAPI)this.downed).downButNotOut$cancelReviving(this);
