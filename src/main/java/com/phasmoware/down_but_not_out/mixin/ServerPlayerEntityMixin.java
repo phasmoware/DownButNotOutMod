@@ -7,6 +7,7 @@ import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import com.phasmoware.down_but_not_out.util.DownedUtility;
 import com.phasmoware.down_but_not_out.util.Constants;
+import net.minecraft.entity.EntityEquipment;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -42,7 +43,10 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
     private boolean isBeingRevived;
 
     @Unique
-    private Text lastText;
+    private Text lastUpdateText;
+
+    @Unique
+    public long ticksSinceLastUpdate;
 
     @Shadow
     public abstract ServerWorld getEntityWorld();
@@ -53,6 +57,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
 
     @Inject(method = "tick()V", at = @At("TAIL"))
     private void injectTickPlayer(CallbackInfo ci) {
+        ticksSinceLastUpdate++;
         if (isDowned(this)) {
             // if player has command tag but not in downed state
             if (this.bleedOutTimer == null) {
@@ -132,13 +137,27 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
     }
 
     @Override
-    public Text downButNotOut$getLastText() {
-        return this.lastText;
+    public Text downButNotOut$getLastUpdateText() {
+        return this.lastUpdateText;
     }
 
     @Override
-    public void downButNotOut$setLastText(Text lastText) {
-        this.lastText = lastText;
+    public void downButNotOut$setLastUpdateText(Text lastText) {
+        this.lastUpdateText = lastText;
     }
 
+    @Override
+    protected EntityEquipment createEquipment() {
+        return super.createEquipment();
+    }
+
+    @Override
+    public long downButNotOut$getTicksSinceLastUpdate() {
+        return this.ticksSinceLastUpdate;
+    }
+
+    @Override
+    public void downButNotOut$setTicksSinceLastUpdate(long ticksSinceLastUpdate) {
+        this.ticksSinceLastUpdate = ticksSinceLastUpdate;
+    }
 }

@@ -60,14 +60,18 @@ public class ReviveTimer {
         if (!reviver.getMainHandStack().isEmpty()) {
             Text msgToReviver = Text.literal("Use a free hand to revive them!").formatted(Formatting.RED);
             MessageHandler.sendUpdateMessage(msgToReviver, reviver);
+            MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
             return false;
         }
         if ((reviver.squaredDistanceTo(downed) > reviver.getEntityInteractionRange() + 1.5)) {
             Text msgToReviver = Text.literal("Too far away to revive them!").formatted(Formatting.RED);
             MessageHandler.sendUpdateMessage(msgToReviver, reviver);
+            MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
             return false;
         }
         if (!downed.isEntityLookingAtMe(reviver, Constants.CONE_SIZE, Constants.ADJUST_FOR_DISTANCE, Constants.SEE_THROUGH_TRANSPARENT_BLOCKS, new double[]{downed.getY(), downed.getEyeY()})) {
+            MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, reviver);
+            MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
             return false;
         }
         return true;
@@ -75,9 +79,9 @@ public class ReviveTimer {
 
     private void updateReviveProgress() {
         Text msgToReviver = Text.literal("Hold to Revive: " + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
-        MessageHandler.sendUpdateMessage(msgToReviver, reviver);
+        MessageHandler.sendThrottledUpdateMessage(msgToReviver, reviver);
         Text msgToDowned = Text.literal("Reviving: " + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
-        MessageHandler.sendUpdateMessage(msgToDowned, downed);
+        MessageHandler.sendThrottledUpdateMessage(msgToDowned, downed);
     }
 
     public void reset(ServerPlayerEntity reviver) {

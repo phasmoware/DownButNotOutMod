@@ -31,8 +31,12 @@ public interface ServerPlayerAPI {
 
     void downButNotOut$setInvisibleArmorStandEntity(ArmorStandEntity armorStandEntity);
 
-    Text downButNotOut$getLastText();
+    Text downButNotOut$getLastUpdateText();
 
-    void downButNotOut$setLastText(Text lastText);
+    void downButNotOut$setLastUpdateText(Text lastUpdateText);
+
+    long downButNotOut$getTicksSinceLastUpdate();
+
+    void downButNotOut$setTicksSinceLastUpdate(long ticksSinceLastUpdate);
 
 }

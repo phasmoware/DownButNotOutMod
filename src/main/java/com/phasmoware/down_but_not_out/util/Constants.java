@@ -1,5 +1,7 @@
 package com.phasmoware.down_but_not_out.util;
 
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ public class Constants {
     public static final String DOWNED_STATE_MSG = " is down, give them a hand to revive them";
     public static final String REVIVED_MSG = " has revived ";
     public static final String BLED_OUT_MSG = "You bled out...";
+    public static final Text REVIVE_CANCELED_TEXT = Text.literal("Revive canceled!").formatted(Formatting.RED);
     public static final float BASE_MOVE_SPEED = 0.1F;
     public static final float DOWNED_SOUND_PITCH = 1.2F;
     public static final float REVIVED_SOUND_PITCH = 0.6F;
@@ -23,4 +26,5 @@ public class Constants {
     public static final float PLAYER_MAX_HEALTH = 1024.5f;
     public static final double DOWN_FORCE = -0.0784000015258789;
     public static final Vec3d DOWNED_NOT_MOVING =  new Vec3d(0.0D, DOWN_FORCE, 0.0D);
+    public static final long UPDATE_MSG_SPAM_COOLDOWN = 15;
 }
