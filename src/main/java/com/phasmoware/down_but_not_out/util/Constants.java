@@ -28,4 +28,5 @@ public class Constants {
     public static final double DOWN_FORCE = -0.0784000015258789;
     public static final Vec3d DOWNED_NOT_MOVING =  new Vec3d(0.0D, DOWN_FORCE, 0.0D);
     public static final long UPDATE_MSG_SPAM_COOLDOWN = 15;
+    public static final long REPEAT_MSG_SPAM_COOLDOWN = 60;
 }

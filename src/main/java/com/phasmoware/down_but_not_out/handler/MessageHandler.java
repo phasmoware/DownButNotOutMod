@@ -41,7 +41,7 @@ public class MessageHandler {
 
     public static void sendUpdateMessage(Text message, ServerPlayerEntity player) {
         ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
-        if (!message.equals(serverPlayer.downButNotOut$getLastUpdateText())) {
+        if (!message.equals(serverPlayer.downButNotOut$getLastUpdateText()) || serverPlayer.downButNotOut$getTicksSinceLastUpdate() > Constants.REPEAT_MSG_SPAM_COOLDOWN) {
             serverPlayer.downButNotOut$setLastUpdateText(message);
             player.sendMessage(message, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
         }

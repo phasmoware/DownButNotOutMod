@@ -13,6 +13,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
+
 public class DownedStateManager {
 
 
@@ -57,11 +59,10 @@ public class DownedStateManager {
         DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI) player);
     }
 
-    public static void onReviveEvent(ServerPlayerEntity player, ServerPlayerEntity reviver) {
+    public static void onReviveComplete(ServerPlayerEntity player, ServerPlayerEntity reviver) {
         MessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() + Constants.REVIVED_MSG +
                 player.getName().getLiteralString(), player.getEntityWorld(), Formatting.GREEN);
         ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
-        serverPlayer.downButNotOut$cancelReviving(serverPlayer.downButNotOut$getReviveTimer());
         serverPlayer.downButNotOut$getBleedOutTimer().setTicksUntilBleedOut(ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS);
         SoundUtility.playRevivedSound(player);
         DownedUtility.removeDownedState(player);
@@ -69,22 +70,37 @@ public class DownedStateManager {
     }
 
     public static void onReviveInteractionEvent(ServerPlayerEntity downed, ServerPlayerEntity reviver) {
-        ReviveTimer reviveTimer = ((ServerPlayerAPI) downed).downButNotOut$getReviveTimer();
-        if (!DownedUtility.playerIsGettingRevivedBy(downed, reviver)) {
-            if (reviveTimer == null) {
-                reviveTimer = new ReviveTimer(reviver, downed);
-                ((ServerPlayerAPI) downed).downButNotOut$startReviving(reviveTimer, reviver);
-                reviveTimer.startReviveInteraction();
-            } else if (reviveTimer.getReviver() != null
-                    && !(reviveTimer.getReviver().equals(reviver))) {
-                reviveTimer.reset(reviver);
-                ((ServerPlayerAPI) downed).downButNotOut$cancelReviving(reviveTimer);
-                ((ServerPlayerAPI) downed).downButNotOut$startReviving(reviveTimer, reviver);
-                reviveTimer.startReviveInteraction();
-            }
-        } else if (DownedUtility.playerIsGettingRevivedBy(downed, reviver)) {
-            reviveTimer.startReviveInteraction();
+        ServerPlayerAPI downedPlayer = (ServerPlayerAPI) downed;
+        ReviveTimer reviveTimer = downedPlayer.downButNotOut$getReviveTimer();
+        reviveTimer.continueRevive(reviver);
+    }
+
+    public static boolean isValidReviver(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
+        if (reviver == null || downed == null) {
+            return false;
         }
+        if (reviver == downed) {
+            return false;
+        }
+        if (isDowned(reviver)) {
+            return false;
+        }
+        if (!isDowned(downed)) {
+            return false;
+        }
+        if (!(reviver.getMainHandStack().isEmpty() && ModConfig.INSTANCE.REVIVING_REQUIRES_EMPTY_HAND)) {
+            onPlayerRevivingWithoutEmptyHand(reviver, downed);
+            return false;
+        }
+        if ((reviver.squaredDistanceTo(downed) > reviver.getBlockInteractionRange())) {
+            onPlayerRevivingTooFarAway(reviver, downed);
+            return false;
+        }
+        if (!downed.isEntityLookingAtMe(reviver, Constants.CONE_SIZE, Constants.ADJUST_FOR_DISTANCE, Constants.SEE_THROUGH_TRANSPARENT_BLOCKS, new double[]{downed.getY(), downed.getEyeY(), downed.getBodyY(0.5)})) {
+            onPlayerLookingAwayWhileReviving(reviver, downed);
+            return false;
+        }
+        return true;
     }
 
     public static void onPlayerDownedInLava(ServerPlayerEntity player) {

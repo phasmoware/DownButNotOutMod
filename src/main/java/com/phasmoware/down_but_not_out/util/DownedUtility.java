@@ -163,22 +163,4 @@ public class DownedUtility {
             }
         }
     }
-
-    public static boolean playerIsGettingRevivedBy(ServerPlayerEntity downed, ServerPlayerEntity reviver) {
-        ServerPlayerAPI downedPlayer = (ServerPlayerAPI) downed;
-
-        if (downedPlayer.downButNotOut$getReviveTimer() == null) {
-            return false;
-        }
-        if (reviver == null) {
-            return false;
-        }
-        if (!(downedPlayer.downButNotOut$getReviveTimer().getReviver().equals(reviver))) {
-            return false;
-        }
-        if (!(downedPlayer.downButNotOut$getReviveTimer().isValidReviver(reviver, downed))) {
-            return false;
-        }
-        return (downedPlayer.downButNotOut$isBeingRevived());
-    }
 }

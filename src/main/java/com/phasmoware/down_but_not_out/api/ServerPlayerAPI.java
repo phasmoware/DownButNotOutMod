@@ -4,14 +4,9 @@ import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 public interface ServerPlayerAPI {
-
-    void downButNotOut$startReviving(ReviveTimer reviveTimer, ServerPlayerEntity reviver);
-
-    void downButNotOut$cancelReviving(ReviveTimer reviveTimer);
 
     boolean downButNotOut$isBeingRevived();
 
@@ -20,8 +15,6 @@ public interface ServerPlayerAPI {
     void downButNotOut$setBleedOutTimer(BleedOutTimer bleedOutTimer);
 
     ReviveTimer downButNotOut$getReviveTimer();
-
-    void downButNotOut$setReviveTimer(ReviveTimer reviveTimer);
 
     ShulkerEntity downButNotOut$getInvisibleShulkerEntity();
 

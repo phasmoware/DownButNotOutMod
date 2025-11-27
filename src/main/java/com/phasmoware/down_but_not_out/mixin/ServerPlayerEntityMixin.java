@@ -7,14 +7,15 @@ import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import com.phasmoware.down_but_not_out.util.DownedUtility;
 import com.phasmoware.down_but_not_out.util.Constants;
-import net.minecraft.entity.EntityEquipment;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,16 +32,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
     private BleedOutTimer bleedOutTimer;
 
     @Unique
-    private ReviveTimer reviveTimer;
+    private final ReviveTimer reviveTimer = new ReviveTimer(null, (ServerPlayerEntity) (Object) this);
 
     @Unique
     private ShulkerEntity invisibleShulkerEntity;
 
     @Unique
     private ArmorStandEntity invisibleArmorStandEntity;
-
-    @Unique
-    private boolean isBeingRevived;
 
     @Unique
     private Text lastUpdateText;
@@ -51,6 +49,10 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
     @Shadow
     public abstract ServerWorld getEntityWorld();
 
+    @Shadow
+    @Final
+    private MinecraftServer server;
+
     public ServerPlayerEntityMixin(World world, GameProfile profile) {
         super(world, profile);
     }
@@ -58,15 +60,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
     @Inject(method = "tick()V", at = @At("TAIL"))
     private void injectTickPlayer(CallbackInfo ci) {
         ticksSinceLastUpdate++;
+        reviveTimer.tick();
         if (isDowned(this)) {
             // if player has command tag but not in downed state
             if (this.bleedOutTimer == null) {
                 DownedStateManager.onPlayerDownedEvent((ServerPlayerEntity) (Object) this, null);
             } else {
                 bleedOutTimer.tick();
-            }
-            if (reviveTimer != null) {
-                reviveTimer.tick();
             }
 
             // keep an invisible ShulkerEntity riding an ArmorStandEntity at player's head to force crawling pose
@@ -79,22 +79,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
 
     @Override
     public boolean downButNotOut$isBeingRevived() {
-        return (this.isBeingRevived);
+        return (this.reviveTimer.isInteractionActive());
     }
 
-    @Override
-    public void downButNotOut$startReviving(ReviveTimer reviveTimer, ServerPlayerEntity reviver) {
-        this.reviveTimer = reviveTimer;
-        this.reviveTimer.reset(reviver);
-        isBeingRevived = true;
-    }
-
-    @Override
-    public void downButNotOut$cancelReviving(ReviveTimer reviveTimer) {
-        reviveTimer.reset(null);
-        this.reviveTimer = null;
-        isBeingRevived = false;
-    }
 
     @Override
     public BleedOutTimer downButNotOut$getBleedOutTimer() {
@@ -111,10 +98,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
         this.bleedOutTimer = bleedOutTimer;
     }
 
-    @Override
-    public void downButNotOut$setReviveTimer(ReviveTimer reviveTimer) {
-        this.reviveTimer = reviveTimer;
-    }
 
     @Override
     public ShulkerEntity downButNotOut$getInvisibleShulkerEntity() {
@@ -144,11 +127,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
     @Override
     public void downButNotOut$setLastUpdateText(Text lastText) {
         this.lastUpdateText = lastText;
-    }
-
-    @Override
-    protected EntityEquipment createEquipment() {
-        return super.createEquipment();
     }
 
     @Override
