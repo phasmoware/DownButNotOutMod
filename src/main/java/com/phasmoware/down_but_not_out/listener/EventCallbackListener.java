@@ -13,9 +13,10 @@ public class EventCallbackListener {
     public static void registerEventCallbacks() {
         listenForDeathEvent();
         listenForInteractionWhileDowned();
-        listenForReviveEvent();
+        listenForReviveInteractionEvent();
         listenForPlayerDisconnect();
         listenForServerCleanUpEvent();
+        listenForPlayerReconnect();
     }
 
     private static void listenForServerCleanUpEvent() {
@@ -50,11 +51,15 @@ public class EventCallbackListener {
                 -> EventCallbackHandler.onConsumeDownedAction(playerEntity));
     }
 
-    private static void listenForReviveEvent() {
+    private static void listenForReviveInteractionEvent() {
         UseEntityCallback.EVENT.register(EventCallbackHandler::onReviveDownedInteraction);
     }
 
     private static void listenForPlayerDisconnect() {
         ServerPlayerEvents.LEAVE.register(EventCallbackHandler::onCleanUpEvent);
+    }
+
+    private static void listenForPlayerReconnect() {
+        ServerPlayerEvents.JOIN.register(EventCallbackHandler::onPlayerJoinWhileDowned);
     }
 }

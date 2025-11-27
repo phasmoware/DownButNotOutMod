@@ -20,10 +20,7 @@ public class DownedStateManager {
 
     public static void onDeathEventOfDownedPlayer(ServerPlayerEntity player, DamageSource damageSource) {
         ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
-        if (serverPlayer.downButNotOut$getBleedOutTimer() != null) {
-            serverPlayer.downButNotOut$getBleedOutTimer().setPlayer(null);
-            serverPlayer.downButNotOut$setBleedOutTimer(null);
-        }
+        serverPlayer.downButNotOut$getBleedOutTimer().reset();
         DownedUtility.removeDownedState(player);
         DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI) player);
         Text bledOutMessage = Text.literal(Constants.BLED_OUT_MSG).formatted(Formatting.RED);
@@ -35,11 +32,8 @@ public class DownedStateManager {
         SoundUtility.playDownedSound(player);
         ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
 
-        // set a bleed out timer (original damageSource will be used for the death)
-        // message and statistics
-        if (serverPlayer.downButNotOut$getBleedOutTimer() == null) {
-           serverPlayer.downButNotOut$setBleedOutTimer(new BleedOutTimer(ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS, player, damageSource));
-        }
+        // original damageSource will be used for the death if possible
+        serverPlayer.downButNotOut$getBleedOutTimer().setDamageSource(damageSource);
 
         DownedUtility.setInvisibleShulkerArmorStandRider((ServerPlayerAPI) player, player.getEntityWorld());
 
@@ -63,7 +57,7 @@ public class DownedStateManager {
         MessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() + Constants.REVIVED_MSG +
                 player.getName().getLiteralString(), player.getEntityWorld(), Formatting.GREEN);
         ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
-        serverPlayer.downButNotOut$getBleedOutTimer().setTicksUntilBleedOut(ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS);
+        applyRevivedPenalty(serverPlayer);
         SoundUtility.playRevivedSound(player);
         DownedUtility.removeDownedState(player);
         DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI) player);
@@ -75,7 +69,7 @@ public class DownedStateManager {
         reviveTimer.continueRevive(reviver);
     }
 
-    public static boolean isValidReviver(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
+    public static boolean checkValidReviver(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
         if (reviver == null || downed == null) {
             return false;
         }
@@ -103,6 +97,7 @@ public class DownedStateManager {
         return true;
     }
 
+
     public static void onPlayerDownedInLava(ServerPlayerEntity player) {
         Text skippedDownedStateMessage = Text.literal(Constants.LAVA_PREVENTED_DOWNED_MSG).formatted(Formatting.RED);
         MessageHandler.sendUpdateMessage(skippedDownedStateMessage, player);
@@ -123,5 +118,13 @@ public class DownedStateManager {
     public static void onPlayerLookingAwayWhileReviving(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
         MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, reviver);
         MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
+    }
+
+    private static void applyRevivedPenalty(ServerPlayerAPI player) {
+        BleedOutTimer timer = player.downButNotOut$getBleedOutTimer();
+        if (ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS > 0 && timer.getTicksUntilBleedOut() > 1) {
+            player.downButNotOut$getBleedOutTimer().setReviveCooldownTicks(ModConfig.INSTANCE.REVIVE_PENALTY_COOLDOWN_TICKS);
+            timer.setTicksUntilBleedOut(timer.getTicksUntilBleedOut() / ModConfig.INSTANCE.REVIVE_PENALTY_MULTIPLIER);
+        }
     }
 }

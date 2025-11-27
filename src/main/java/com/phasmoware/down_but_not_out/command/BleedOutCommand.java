@@ -19,7 +19,6 @@ public class BleedOutCommand implements Command<ServerCommandSource> {
         if (player == null) {
             MessageHandler.sendErrorMessage(Text.literal("You must be a player to use this command."), source);
             return 1;
-
         }
         if (!(player.getCommandTags().contains(Constants.DOWNED_TAG))) {
             MessageHandler.sendErrorMessage(Text.literal("You are not in a downed state."), source);
@@ -32,7 +31,6 @@ public class BleedOutCommand implements Command<ServerCommandSource> {
 
         // set ticks until bleed out to 1 to bleed out next tick
         ((ServerPlayerAPI)player).downButNotOut$getBleedOutTimer().setTicksUntilBleedOut(1);
-
         return 0;
     }
 }

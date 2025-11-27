@@ -32,7 +32,6 @@ public class DownedUtility {
             }
         } else {
             player.kill(player.getEntityWorld());
-            Constants.LOGGER.warn(player.getName() + "'s DamageSource is NULL on bleed out");
         }
     }
 
@@ -154,12 +153,14 @@ public class DownedUtility {
     public static void forceCrawlPose(ServerPlayerAPI serverPlayer) {
         ServerPlayerEntity player = (ServerPlayerEntity) serverPlayer;
         player.setPose(EntityPose.SWIMMING);
-        Vec3d headPosition = new Vec3d(player.getX(), player.getY(), player.getZ()).offset(Direction.UP, 1);
-        if (!player.isInFluid()) {
-            if (serverPlayer.downButNotOut$getInvisibleArmorStandEntity() != null && !serverPlayer.downButNotOut$getInvisibleArmorStandEntity().isRemoved()) {
-                serverPlayer.downButNotOut$getInvisibleArmorStandEntity().setPosition(headPosition.x, headPosition.y, headPosition.z);
-            } else if (serverPlayer.downButNotOut$getInvisibleShulkerEntity() == null || serverPlayer.downButNotOut$getInvisibleShulkerEntity().isRemoved()) {
-                DownedUtility.setInvisibleShulkerArmorStandRider(serverPlayer, player.getEntityWorld());
+        if (!(player.getVelocity().equals(Constants.DOWNED_NOT_MOVING)) || !(player.getVelocity().equals(Vec3d.ZERO))) {
+            Vec3d headPosition = new Vec3d(player.getX(), player.getY(), player.getZ()).offset(Direction.UP, 1);
+            if (!player.isInFluid()) {
+                if (serverPlayer.downButNotOut$getInvisibleArmorStandEntity() != null && !serverPlayer.downButNotOut$getInvisibleArmorStandEntity().isRemoved()) {
+                    serverPlayer.downButNotOut$getInvisibleArmorStandEntity().setPosition(headPosition.x, headPosition.y, headPosition.z);
+                } else if (serverPlayer.downButNotOut$getInvisibleShulkerEntity() == null || serverPlayer.downButNotOut$getInvisibleShulkerEntity().isRemoved()) {
+                    DownedUtility.setInvisibleShulkerArmorStandRider(serverPlayer, player.getEntityWorld());
+                }
             }
         }
     }

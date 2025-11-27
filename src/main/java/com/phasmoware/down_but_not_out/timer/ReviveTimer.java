@@ -24,7 +24,7 @@ public class ReviveTimer {
 
 
     public void tick() {
-        if (DownedStateManager.isValidReviver(reviver, downed)) {
+        if (DownedStateManager.checkValidReviver(reviver, downed)) {
             interactionActive = true;
             reviveProgressTicks++;
             updateReviveProgress();

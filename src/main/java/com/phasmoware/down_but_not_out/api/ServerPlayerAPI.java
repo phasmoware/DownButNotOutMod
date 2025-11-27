@@ -8,11 +8,7 @@ import net.minecraft.text.Text;
 
 public interface ServerPlayerAPI {
 
-    boolean downButNotOut$isBeingRevived();
-
     BleedOutTimer downButNotOut$getBleedOutTimer();
-
-    void downButNotOut$setBleedOutTimer(BleedOutTimer bleedOutTimer);
 
     ReviveTimer downButNotOut$getReviveTimer();
 

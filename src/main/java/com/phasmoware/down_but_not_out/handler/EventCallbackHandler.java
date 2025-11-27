@@ -65,4 +65,10 @@ public class EventCallbackHandler {
     public static void onCleanUpEvent(PlayerEntity playerEntity) {
         DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI)  playerEntity);
     }
+
+    public static void onPlayerJoinWhileDowned(ServerPlayerEntity serverPlayer) {
+        if (isDowned(serverPlayer)) {
+            DownedStateManager.onPlayerDownedEvent(serverPlayer, null);
+        }
+    }
 }
