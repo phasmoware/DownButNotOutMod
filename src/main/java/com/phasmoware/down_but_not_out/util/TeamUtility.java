@@ -3,10 +3,10 @@ package com.phasmoware.down_but_not_out.util;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.scoreboard.AbstractTeam;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.scoreboard.*;
+import net.minecraft.scoreboard.number.NumberFormat;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -54,7 +54,7 @@ public class TeamUtility {
                 team.setShowFriendlyInvisibles(false);
                 team.setCollisionRule(AbstractTeam.CollisionRule.PUSH_OWN_TEAM);
                 team.setColor(Formatting.DARK_RED);
-                team.setPrefix(Text.literal("◥REVIVE◤ ").formatted(Formatting.YELLOW));
+                team.setPrefix(Constants.DOWNED_TEMP_TEAM_PREFIX);
             }
 
             Team team = scoreboard.getTeam(teamName);

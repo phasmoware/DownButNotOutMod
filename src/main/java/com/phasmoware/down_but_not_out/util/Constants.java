@@ -18,6 +18,7 @@ public class Constants {
     public static final String REVIVED_MSG = " has revived ";
     public static final String BLED_OUT_MSG = "You bled out...";
     public static final Text REVIVE_CANCELED_TEXT = Text.literal("Revive canceled!").formatted(Formatting.RED);
+    public static final Text DOWNED_TEMP_TEAM_PREFIX = Text.literal("◥REVIVE◤ ");
     public static final float BASE_MOVE_SPEED = 0.1F;
     public static final float DOWNED_SOUND_PITCH = 1.2F;
     public static final float REVIVED_SOUND_PITCH = 0.6F;
