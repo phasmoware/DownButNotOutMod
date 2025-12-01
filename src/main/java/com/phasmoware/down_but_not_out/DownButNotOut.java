@@ -1,19 +1,18 @@
 package com.phasmoware.down_but_not_out;
 
+import com.phasmoware.down_but_not_out.command.ModCommands;
+import com.phasmoware.down_but_not_out.config.ModConfig;
+import com.phasmoware.down_but_not_out.listener.EventCallbackListener;
+import com.phasmoware.down_but_not_out.util.Constants;
 import net.fabricmc.api.ModInitializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 public class DownButNotOut implements ModInitializer {
 
-    public static final String MOD_ID = "down_but_not_out";
-    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-
     @Override
     public void onInitialize() {
-
-        LOGGER.info(MOD_ID + " mod initialized");
+        ModConfig.init();
+        EventCallbackListener.registerEventCallbacks();
+        ModCommands.initialize();
+        Constants.LOGGER.info(Constants.MOD_ID + " mod initialized");
     }
-
 }
