@@ -4,8 +4,8 @@ import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.handler.MessageHandler;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
-import com.phasmoware.down_but_not_out.util.DownedUtility;
 import com.phasmoware.down_but_not_out.util.Constants;
+import com.phasmoware.down_but_not_out.util.DownedUtility;
 import com.phasmoware.down_but_not_out.util.SoundUtility;
 import com.phasmoware.down_but_not_out.util.TeamUtility;
 import net.minecraft.entity.damage.DamageSource;
@@ -42,8 +42,8 @@ public class DownedStateManager {
             TeamUtility.assignShulkerAndArmorStandToTempDownedTeam(player);
         }
 
-        MessageHandler.broadcastMessageToPlayers(player.getName().getLiteralString() + Constants.DOWNED_STATE_MSG,
-                player.getEntityWorld(), Formatting.RED);
+        MessageHandler.broadcastMessageToPlayers(player.getName().getLiteralString() +
+                Constants.DOWNED_STATE_MSG, player.getEntityWorld(), Formatting.RED);
 
         MessageHandler.sendClickableGiveUpMessage(player);
     }
@@ -59,8 +59,8 @@ public class DownedStateManager {
     }
 
     public static void onReviveComplete(ServerPlayerEntity player, ServerPlayerEntity reviver) {
-        MessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() + Constants.REVIVED_MSG +
-                player.getName().getLiteralString(), player.getEntityWorld(), Formatting.GREEN);
+        MessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() +
+                Constants.REVIVED_MSG + player.getName().getLiteralString(), player.getEntityWorld(), Formatting.GREEN);
         ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
         DownedUtility.applyRevivedPenalty(serverPlayer);
         SoundUtility.playRevivedSound(player);

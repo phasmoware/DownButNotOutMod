@@ -17,18 +17,18 @@ public class MessageHandler {
         player.sendMessage(Text.literal("Click ").styled(style -> style
                 .withBold(true)
                 .withItalic(true)
-                .withColor(Formatting.DARK_GRAY)
-        ).append(Text.literal("[HERE]").styled(style -> style
-                .withColor(Formatting.AQUA)
-                .withUnderline(true)
-                .withBold(true)
-                .withClickEvent(new ClickEvent.RunCommand("bleedout"))
-                .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run Command /bleedout")))
-        )).append(Text.literal(" or type /bleedout to give up and respawn").styled(style -> style
-                .withBold(true)
-                .withItalic(true)
-                .withColor(Formatting.DARK_GRAY)
-        )), false); // can't be an overlay with a click event
+                .withColor(Formatting.DARK_GRAY))
+                .append(Text.literal("[HERE]")
+                        .styled(style -> style
+                                .withColor(Formatting.AQUA)
+                                .withUnderline(true).withBold(true)
+                                .withClickEvent(new ClickEvent.RunCommand("bleedout"))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run Command /bleedout")))))
+                .append(Text.literal(" or type /bleedout to give up and respawn")
+                        .styled(style -> style
+                                .withBold(true).
+                                withItalic(true)
+                                .withColor(Formatting.DARK_GRAY))), false); // can't be an overlay with a click event
     }
 
     public static void sendThrottledUpdateMessage(Text message, ServerPlayerEntity player) {

@@ -17,7 +17,6 @@ public final class ConfigUtility {
     private static final String CONF_FILE = "config.json";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path GLOBAL_CONF_PATH = FabricLoader.getInstance().getConfigDir();
-    private static final Path CONF_FILE_PATH = GLOBAL_CONF_PATH.resolve(CONF_DIR).resolve(CONF_FILE);
 
     private static File requestConfigFile() throws IOException {
         Path directoryPath = GLOBAL_CONF_PATH.resolve(CONF_DIR);
@@ -35,7 +34,7 @@ public final class ConfigUtility {
     public static ModConfig loadConfig() {
         try {
             File file = requestConfigFile();
-            return GSON.fromJson(Files.readString(file.toPath()),  ModConfig.class);
+            return GSON.fromJson(Files.readString(file.toPath()), ModConfig.class);
         } catch (JsonSyntaxException je) {
             Constants.LOGGER.error("Error: Config file has syntax errors! Please make sure it is valid json or delete it to revert to defaults!", je);
             throw new RuntimeException(je);

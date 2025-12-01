@@ -7,7 +7,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.*;
 
 
-
 public class EventCallbackListener {
 
     public static void registerEventCallbacks() {
@@ -20,9 +19,8 @@ public class EventCallbackListener {
     }
 
     private static void listenForServerCleanUpEvent() {
-        ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-            server.getPlayerManager().getPlayerList().forEach(EventCallbackHandler::onCleanUpEvent);
-        });
+        ServerLifecycleEvents.SERVER_STOPPING.register(server ->
+                server.getPlayerManager().getPlayerList().forEach(EventCallbackHandler::onCleanUpEvent));
     }
 
     private static void listenForDeathEvent() {
@@ -32,23 +30,20 @@ public class EventCallbackListener {
     private static void listenForInteractionWhileDowned() {
 
         // prevent left click block interaction while downed
-        AttackBlockCallback.EVENT.register(
-                (playerEntity, world, hand, blockPos, direction)
-                        -> EventCallbackHandler.onConsumeDownedAction(playerEntity));
+        AttackBlockCallback.EVENT.register((playerEntity, world, hand, blockPos, direction) ->
+                EventCallbackHandler.onConsumeDownedAction(playerEntity));
 
         // prevent right click block interaction while downed
-        UseBlockCallback.EVENT.register(
-                (playerEntity, world, hand, blockHitResult)
-                        -> EventCallbackHandler.onConsumeDownedAction(playerEntity));
+        UseBlockCallback.EVENT.register((playerEntity, world, hand, blockHitResult) ->
+                EventCallbackHandler.onConsumeDownedAction(playerEntity));
 
         // prevent left click entity interaction while downed
-        AttackEntityCallback.EVENT.register(
-                (playerEntity, world, hand, entity, entityHitResult)
-                        -> EventCallbackHandler.onConsumeDownedAction(playerEntity));
+        AttackEntityCallback.EVENT.register((playerEntity, world, hand, entity, entityHitResult) ->
+                EventCallbackHandler.onConsumeDownedAction(playerEntity));
 
         // prevent right click item interaction while downed
-        UseItemCallback.EVENT.register((playerEntity, world, hand)
-                -> EventCallbackHandler.onConsumeDownedAction(playerEntity));
+        UseItemCallback.EVENT.register((playerEntity, world, hand) ->
+                EventCallbackHandler.onConsumeDownedAction(playerEntity));
     }
 
     private static void listenForReviveInteractionEvent() {

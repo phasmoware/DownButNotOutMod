@@ -3,7 +3,9 @@ package com.phasmoware.down_but_not_out.util;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.scoreboard.*;
+import net.minecraft.scoreboard.AbstractTeam;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -24,11 +26,6 @@ public class TeamUtility {
             return false;
         }
         return !team.getName().equals(getTempDownedTeamName(player));
-    }
-
-    public static boolean isOnATeamAlready(ServerPlayerAPI player) {
-        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-        return isOnATeamAlready(serverPlayer);
     }
 
     public static String getTempDownedTeamName(ServerPlayerEntity player) {
@@ -92,9 +89,9 @@ public class TeamUtility {
             TeamUtility.updateTempTeamColor(player, Formatting.GOLD);
         } else if (progress > 0.5f && progress <= 0.75f) {
             TeamUtility.updateTempTeamColor(player, Formatting.RED);
-        }  else if (progress > 0.75f && progress <= 0.99f) {
+        } else if (progress > 0.75f && progress <= 0.99f) {
             TeamUtility.updateTempTeamColor(player, Formatting.DARK_RED);
-        }  else if (progress == 1f) {
+        } else if (progress == 1f) {
             TeamUtility.updateTempTeamColor(player, Formatting.GRAY);
         }
     }

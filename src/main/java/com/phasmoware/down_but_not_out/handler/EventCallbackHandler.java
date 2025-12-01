@@ -35,8 +35,7 @@ public class EventCallbackHandler {
             DownedStateManager.onPlayerDownedInLava(player);
             return true;
         }
-        if (ModConfig.INSTANCE.SKIP_DOWNED_STATE_IF_NO_OTHER_PLAYERS_ONLINE
-                && player.getEntityWorld().getServer().getCurrentPlayerCount() <= 1) {
+        if (ModConfig.INSTANCE.SKIP_DOWNED_STATE_IF_NO_OTHER_PLAYERS_ONLINE && player.getEntityWorld().getServer().getCurrentPlayerCount() <= 1) {
             DownedStateManager.onPlayerDownedInEmptyServer(player);
             return true;
         }
@@ -55,8 +54,7 @@ public class EventCallbackHandler {
     public static ActionResult onReviveDownedInteraction(PlayerEntity playerEntity, World world, Hand hand, Entity entity, EntityHitResult entityHitResult) {
         if (isDowned(playerEntity)) {
             return ActionResult.CONSUME;
-        } else if (entity instanceof ServerPlayerEntity downed
-                && (isDowned(entity))) {
+        } else if (entity instanceof ServerPlayerEntity downed && (isDowned(entity))) {
             ServerPlayerEntity reviver = (ServerPlayerEntity) playerEntity;
             DownedStateManager.onReviveInteractionEvent(downed, reviver);
         }
@@ -64,7 +62,7 @@ public class EventCallbackHandler {
     }
 
     public static void onCleanUpEvent(PlayerEntity playerEntity) {
-        DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI)  playerEntity);
+        DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI) playerEntity);
         TeamUtility.removeTempDownedTeam((ServerPlayerEntity) playerEntity);
     }
 

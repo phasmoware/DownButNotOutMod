@@ -14,9 +14,9 @@ import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
 
 public class BleedOutTimer {
 
-    private long ticksUntilBleedOut;
     @NotNull
     private final ServerPlayerEntity player;
+    private long ticksUntilBleedOut;
     @Nullable
     private DamageSource damageSource;
     private long reviveCooldownTicks;
@@ -92,12 +92,12 @@ public class BleedOutTimer {
         this.damageSource = null;
     }
 
-    public void setTicksUntilBleedOut(long ticksUntilBleedOut) {
-        this.ticksUntilBleedOut = ticksUntilBleedOut;
-    }
-
     public long getTicksUntilBleedOut() {
         return ticksUntilBleedOut;
+    }
+
+    public void setTicksUntilBleedOut(long ticksUntilBleedOut) {
+        this.ticksUntilBleedOut = ticksUntilBleedOut;
     }
 
     public void setDamageSource(@Nullable DamageSource damageSource) {

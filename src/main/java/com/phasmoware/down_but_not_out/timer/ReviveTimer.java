@@ -11,12 +11,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ReviveTimer {
+    @NotNull
+    private final ServerPlayerEntity downed;
     private boolean interactionActive = false;
     private long reviveProgressTicks;
     @Nullable
     private ServerPlayerEntity reviver;
-    @NotNull
-    private final ServerPlayerEntity downed;
 
     public ReviveTimer(@Nullable ServerPlayerEntity reviver, @NotNull ServerPlayerEntity downed) {
         this.reviver = reviver;
@@ -81,9 +81,5 @@ public class ReviveTimer {
 
     public int getCurrentProgressPercent() {
         return (int) ((((float) this.reviveProgressTicks / (float) ModConfig.INSTANCE.REVIVE_DURATION_TICKS)) * 100);
-    }
-
-    public @Nullable ServerPlayerEntity getReviver() {
-        return reviver;
     }
 }

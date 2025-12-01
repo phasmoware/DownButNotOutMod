@@ -8,12 +8,10 @@ import com.phasmoware.down_but_not_out.util.DownedUtility;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,29 +29,21 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
 
     @Unique
     private final ReviveTimer reviveTimer = new ReviveTimer(null, (ServerPlayerEntity) (Object) this);
-
-    @Unique
-    private ShulkerEntity invisibleShulkerEntity;
-
-    @Unique
-    private ArmorStandEntity invisibleArmorStandEntity;
-
-    @Unique
-    private Text lastUpdateText;
-
     @Unique
     public long ticksSinceLastUpdate;
-
-    @Shadow
-    public abstract ServerWorld getEntityWorld();
-
-    @Shadow
-    @Final
-    private MinecraftServer server;
+    @Unique
+    private ShulkerEntity invisibleShulkerEntity;
+    @Unique
+    private ArmorStandEntity invisibleArmorStandEntity;
+    @Unique
+    private Text lastUpdateText;
 
     public ServerPlayerEntityMixin(World world, GameProfile profile) {
         super(world, profile);
     }
+
+    @Shadow
+    public abstract ServerWorld getEntityWorld();
 
     @Inject(method = "tick()V", at = @At("TAIL"))
     private void injectTickPlayer(CallbackInfo ci) {
