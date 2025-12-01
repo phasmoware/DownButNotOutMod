@@ -49,7 +49,6 @@ public class TeamUtility {
                 team.setShowFriendlyInvisibles(false);
                 team.setCollisionRule(AbstractTeam.CollisionRule.PUSH_OWN_TEAM);
                 team.setColor(Formatting.DARK_RED);
-                team.setPrefix(Constants.DOWNED_TEMP_TEAM_PREFIX);
             }
 
             Team team = scoreboard.getTeam(teamName);
