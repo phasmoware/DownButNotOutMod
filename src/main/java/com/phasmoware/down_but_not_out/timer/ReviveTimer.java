@@ -3,6 +3,7 @@ package com.phasmoware.down_but_not_out.timer;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.handler.MessageHandler;
 import com.phasmoware.down_but_not_out.manager.DownedStateManager;
+import com.phasmoware.down_but_not_out.util.TeamUtility;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -25,6 +26,7 @@ public class ReviveTimer {
 
     public void tick() {
         if (DownedStateManager.checkValidReviver(reviver, downed)) {
+            TeamUtility.updateRevivingTeamColor(downed);
             interactionActive = true;
             reviveProgressTicks++;
             updateReviveProgress();
@@ -36,15 +38,16 @@ public class ReviveTimer {
         } else if (interactionActive || reviver != null) {
             stopReviveInteraction();
         } else {
+            stopReviveInteraction();
             decrementReviveProgress();
         }
     }
 
 
     private void updateReviveProgress() {
-        Text msgToReviver = Text.literal("Hold to Revive: " + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
+        Text msgToReviver = Text.literal("Hold to Revive: " + getCurrentProgressPercent() + "%").formatted(Formatting.AQUA);
         MessageHandler.sendThrottledUpdateMessage(msgToReviver, reviver);
-        Text msgToDowned = Text.literal("Reviving: " + getCurrentProgressPercent() + "%").formatted(Formatting.BLUE);
+        Text msgToDowned = Text.literal("Reviving: " + getCurrentProgressPercent() + "%").formatted(Formatting.AQUA);
         MessageHandler.sendThrottledUpdateMessage(msgToDowned, downed);
     }
 

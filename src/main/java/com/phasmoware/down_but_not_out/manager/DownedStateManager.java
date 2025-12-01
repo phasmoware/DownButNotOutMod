@@ -3,11 +3,11 @@ package com.phasmoware.down_but_not_out.manager;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.handler.MessageHandler;
-import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import com.phasmoware.down_but_not_out.util.DownedUtility;
 import com.phasmoware.down_but_not_out.util.Constants;
 import com.phasmoware.down_but_not_out.util.SoundUtility;
+import com.phasmoware.down_but_not_out.util.TeamUtility;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -37,6 +37,11 @@ public class DownedStateManager {
 
         DownedUtility.setInvisibleShulkerArmorStandRider((ServerPlayerAPI) player, player.getEntityWorld());
 
+        if (ModConfig.INSTANCE.USE_CUSTOM_DOWNED_TEAMS) {
+            TeamUtility.assignTempDownedTeam(player);
+            TeamUtility.assignShulkerAndArmorStandToTempDownedTeam(player);
+        }
+
         MessageHandler.broadcastMessageToPlayers(player.getName().getLiteralString() + Constants.DOWNED_STATE_MSG,
                 player.getEntityWorld(), Formatting.RED);
 
@@ -57,7 +62,7 @@ public class DownedStateManager {
         MessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() + Constants.REVIVED_MSG +
                 player.getName().getLiteralString(), player.getEntityWorld(), Formatting.GREEN);
         ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
-        applyRevivedPenalty(serverPlayer);
+        DownedUtility.applyRevivedPenalty(serverPlayer);
         SoundUtility.playRevivedSound(player);
         DownedUtility.removeDownedState(player);
         DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI) player);
@@ -120,11 +125,5 @@ public class DownedStateManager {
         MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
     }
 
-    private static void applyRevivedPenalty(ServerPlayerAPI player) {
-        BleedOutTimer timer = player.downButNotOut$getBleedOutTimer();
-        if (ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS > 0 && timer.getTicksUntilBleedOut() > 1) {
-            player.downButNotOut$getBleedOutTimer().setReviveCooldownTicks(ModConfig.INSTANCE.REVIVE_PENALTY_COOLDOWN_TICKS);
-            timer.setTicksUntilBleedOut(timer.getTicksUntilBleedOut() / ModConfig.INSTANCE.REVIVE_PENALTY_MULTIPLIER);
-        }
-    }
+
 }

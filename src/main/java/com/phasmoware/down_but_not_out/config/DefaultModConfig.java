@@ -8,12 +8,14 @@ public class DefaultModConfig {
     public boolean USE_OVERLAY_MESSAGES = true;
     public boolean DOWNED_PLAYERS_HAVE_GLOW_EFFECT = true;
     public boolean DOWNED_PLAYERS_HAVE_BLINDNESS_EFFECT = true;
+    public boolean USE_CUSTOM_DOWNED_TEAMS = true;
+    public boolean ALLOW_CHANGE_GAME_MODE = true;
     public long REVIVE_PENALTY_COOLDOWN_TICKS = 600L;
     public int REVIVE_PENALTY_MULTIPLIER = 4;
     public long BLEEDING_OUT_DURATION_TICKS = 900L;
     public long REVIVE_DURATION_TICKS = 60L;
     public float HEARTBEAT_SOUND_VOLUME = 1.0F;
-    public float REVIVED_SOUND_VOLUME = 2.0F;
-    public float DOWNED_SOUND_VOLUME = 2.0F;
+    public float REVIVED_SOUND_VOLUME = 2.5F;
+    public float DOWNED_SOUND_VOLUME = 1.0F;
     public float DOWNED_MOVE_SPEED = 0.01F;
 }

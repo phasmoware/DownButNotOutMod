@@ -1,8 +1,10 @@
 package com.phasmoware.down_but_not_out.timer;
 
+import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.manager.DownedStateManager;
 import com.phasmoware.down_but_not_out.util.SoundUtility;
+import com.phasmoware.down_but_not_out.util.TeamUtility;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
@@ -29,11 +31,14 @@ public class BleedOutTimer {
     public void tick() {
         if (isDowned(player)) {
             tickHeartbeats();
-            if (this.ticksUntilBleedOut > 0L) {
-                --this.ticksUntilBleedOut;
-                if (this.ticksUntilBleedOut == 0L) {
-                    DownedStateManager.onBleedOutEvent(player, damageSource);
-                    reset();
+            if (!playerIsGettingRevived()) {
+                TeamUtility.updateBleedOutStatusTeamColor(player, getCurrentProgress());
+                if (this.ticksUntilBleedOut > 0L && !playerIsGettingRevived()) {
+                    --this.ticksUntilBleedOut;
+                    if (this.ticksUntilBleedOut == 0L) {
+                        DownedStateManager.onBleedOutEvent(player, damageSource);
+                        reset();
+                    }
                 }
             }
         } else {
@@ -101,5 +106,9 @@ public class BleedOutTimer {
 
     public void setReviveCooldownTicks(long reviveCooldownTicks) {
         this.reviveCooldownTicks = reviveCooldownTicks;
+    }
+
+    private boolean playerIsGettingRevived() {
+        return ((ServerPlayerAPI) player).downButNotOut$getReviveTimer().isInteractionActive();
     }
 }

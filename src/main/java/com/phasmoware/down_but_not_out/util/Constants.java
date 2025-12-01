@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class Constants {
     public static final String MOD_ID = "down_but_not_out";
+    public static final String MOD_ABBREV_PREFIX = "dbno_";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final float HEARTS_AFTER_REVIVE = 0.01f;
     public static final String DOWNED_TAG = "Downed";

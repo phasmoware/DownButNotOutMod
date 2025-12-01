@@ -3,6 +3,7 @@ package com.phasmoware.down_but_not_out.util;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.mixin.ArmorStandEntityAccessor;
+import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
@@ -68,7 +69,9 @@ public class DownedUtility {
             player.setHealth(Constants.HEARTS_AFTER_REVIVE);
             player.addCommandTag(Constants.DOWNED_TAG);
             player.setInvulnerable(true);
-            player.changeGameMode(GameMode.ADVENTURE);
+            if (ModConfig.INSTANCE.ALLOW_CHANGE_GAME_MODE) {
+                player.changeGameMode(GameMode.ADVENTURE);
+            }
             if (ModConfig.INSTANCE.DOWNED_PLAYERS_HAVE_GLOW_EFFECT) {
                 player.setGlowing(true);
             }
@@ -87,12 +90,15 @@ public class DownedUtility {
         if (player != null) {
             player.removeCommandTag(Constants.DOWNED_TAG);
             player.setInvulnerable(false);
-            player.changeGameMode(GameMode.SURVIVAL);
+            if (ModConfig.INSTANCE.ALLOW_CHANGE_GAME_MODE) {
+                player.changeGameMode(GameMode.SURVIVAL);
+            }
             player.setGlowing(false);
             EntityAttributeInstance moveSpeed = player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
             moveSpeed.setBaseValue(Constants.BASE_MOVE_SPEED);
             player.removeStatusEffect(StatusEffects.DARKNESS);
             player.removeStatusEffect(StatusEffects.SLOWNESS);
+            TeamUtility.removeTempDownedTeam(player);
         } else {
             Constants.LOGGER.error("Error: Can't remove downed state because player is null!");
         }
@@ -162,6 +168,14 @@ public class DownedUtility {
                     DownedUtility.setInvisibleShulkerArmorStandRider(serverPlayer, player.getEntityWorld());
                 }
             }
+        }
+    }
+
+    public static void applyRevivedPenalty(ServerPlayerAPI player) {
+        BleedOutTimer timer = player.downButNotOut$getBleedOutTimer();
+        if (ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS > 0 && timer.getTicksUntilBleedOut() > 1) {
+            player.downButNotOut$getBleedOutTimer().setReviveCooldownTicks(ModConfig.INSTANCE.REVIVE_PENALTY_COOLDOWN_TICKS);
+            timer.setTicksUntilBleedOut(timer.getTicksUntilBleedOut() / ModConfig.INSTANCE.REVIVE_PENALTY_MULTIPLIER);
         }
     }
 }
