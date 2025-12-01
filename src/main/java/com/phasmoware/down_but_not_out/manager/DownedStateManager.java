@@ -95,7 +95,7 @@ public class DownedStateManager {
             onPlayerRevivingTooFarAway(reviver, downed);
             return false;
         }
-        if (!downed.isEntityLookingAtMe(reviver, Constants.CONE_SIZE, Constants.ADJUST_FOR_DISTANCE, Constants.SEE_THROUGH_TRANSPARENT_BLOCKS, new double[]{downed.getY(), downed.getEyeY(), downed.getBodyY(0.5)})) {
+        if (!DownedUtility.isLookingAtPlayer(reviver, downed)) {
             onPlayerLookingAwayWhileReviving(reviver, downed);
             return false;
         }

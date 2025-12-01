@@ -12,9 +12,6 @@ public class Constants {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final float HEARTS_AFTER_REVIVE = 0.01f;
     public static final String DOWNED_TAG = "Downed";
-    public static final double CONE_SIZE = 0.05;
-    public static final boolean ADJUST_FOR_DISTANCE = true;
-    public static final boolean SEE_THROUGH_TRANSPARENT_BLOCKS = true;
     public static final String SKIPPED_DOWNED_STATE_MSG = "No one was available to revive you...";
     public static final String LAVA_PREVENTED_DOWNED_MSG = "The lava prevented you from being downed...";
     public static final String DOWNED_STATE_MSG = " is down, give them a hand to revive them";

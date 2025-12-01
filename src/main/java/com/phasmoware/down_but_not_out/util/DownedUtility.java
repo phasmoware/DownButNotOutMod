@@ -18,9 +18,12 @@ import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
+
+import java.util.Optional;
 
 public class DownedUtility {
 
@@ -177,5 +180,17 @@ public class DownedUtility {
             player.downButNotOut$getBleedOutTimer().setReviveCooldownTicks(ModConfig.INSTANCE.REVIVE_PENALTY_COOLDOWN_TICKS);
             timer.setTicksUntilBleedOut(timer.getTicksUntilBleedOut() / ModConfig.INSTANCE.REVIVE_PENALTY_MULTIPLIER);
         }
+    }
+
+    public static boolean isLookingAtPlayer(ServerPlayerEntity viewer, ServerPlayerEntity target) {
+        if (viewer == target) {
+            return false;
+        }
+        Vec3d eyePos = viewer.getCameraPosVec(1.0f);
+        Vec3d lookDir = viewer.getRotationVec(1.0f);
+        Vec3d rayEnd = eyePos.add(lookDir.multiply(viewer.getEntityInteractionRange()));
+        Box targetBox = target.getBoundingBox().expand(0.1);
+        Optional<Vec3d> hit = targetBox.raycast(eyePos, rayEnd);
+        return hit.isPresent();
     }
 }
