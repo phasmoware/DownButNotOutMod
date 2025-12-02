@@ -11,7 +11,7 @@ To revive your downed friend, simply hold **right click** with an empty hand on 
 ### Features:
 - Instead of dying, a player is downed with a half of a heart and can be revived by other players
 - Downed players have a bleed out timer and die if not revived in time
-- Provides and easy to use clickable command "/bleedout" to give up early and respawn
+- Provides a clickable command "/bleedout" to give up early and respawn
 - Fully server side and works with Vanilla clients (only needs to be installed on server)
 - Works with Geyser Bedrock clients (with only visual limitations like glowing effects not visible, crawling animation limited, ect.)
 - Player's name and glowing effect color progressively turn from yellow to dark red to indicate how long a player has left
