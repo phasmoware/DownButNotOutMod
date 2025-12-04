@@ -9,7 +9,7 @@ public class Constants {
     public static final String MOD_ID = "down_but_not_out";
     public static final String MOD_ABBREV_PREFIX = "dbno_";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final float HEARTS_WHILE_DOWNED = 0.01f;
+    public static final float HEARTS_WHILE_DOWNED = 0.5f;
     public static final String DOWNED_TAG = "Downed";
     public static final String SKIPPED_DOWNED_STATE_MSG = "No one was available to revive you...";
     public static final String LAVA_PREVENTED_DOWNED_MSG = "The lava prevented you from being downed...";
