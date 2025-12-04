@@ -105,14 +105,12 @@ public class DownedUtility {
         }
     }
 
-    public static ArmorStandEntity spawnInvisibleArmorStand(ServerPlayerEntity player) {
-        ArmorStandEntity armorStand = new ArmorStandEntity(EntityType.ARMOR_STAND, player.getEntityWorld());
-        armorStand.setInvisible(true);
+    public static ArmorStandEntity spawnInvisibleArmorStand(ServerWorld world) {
+        ArmorStandEntity armorStand = new ArmorStandEntity(EntityType.ARMOR_STAND, world);
+        armorStand.setInvisible(false);
         armorStand.setNoGravity(true);
         armorStand.setInvulnerable(true);
         armorStand.setSilent(true);
-        armorStand.setPosition(player.getEntityPos());
-
         ((ArmorStandEntityAccessor) armorStand).invokeSetMarker(true);
         ((ArmorStandEntityAccessor) armorStand).invokeSetSmall(true);
         if (ModConfig.INSTANCE.SHOW_REVIVE_TAG_ABOVE_PLAYER) {
@@ -123,37 +121,44 @@ public class DownedUtility {
         }
         EntityAttributeInstance armorStandScale = armorStand.getAttributeInstance(EntityAttributes.SCALE);
         armorStandScale.setBaseValue(Constants.MIN_ENTITY_SCALE);
-        player.getEntityWorld().spawnEntity(armorStand);
+        world.spawnEntity(armorStand);
         return armorStand;
     }
 
-    public static ShulkerEntity spawnInvisibleShulker(ServerPlayerEntity player) {
-        ShulkerEntity shulkerEntity = new ShulkerEntity(EntityType.SHULKER, player.getEntityWorld());
-        shulkerEntity.setPosition(player.getEntityPos());
+    public static ShulkerEntity spawnInvisibleShulker(ServerWorld world) {
+        ShulkerEntity shulkerEntity = new ShulkerEntity(EntityType.SHULKER, world);
         shulkerEntity.setInvulnerable(true);
         shulkerEntity.setNoGravity(true);
         shulkerEntity.setAiDisabled(true);
         shulkerEntity.setSilent(true);
-        shulkerEntity.setCustomNameVisible(false);
+        shulkerEntity.setCustomNameVisible(true);
+        shulkerEntity.setCustomName(Text.literal("Test"));
 
-        EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
-        attributeInstance.setBaseValue(Constants.MIN_ENTITY_SCALE);
+        //EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
+        //attributeInstance.setBaseValue(Constants.MIN_ENTITY_SCALE);
 
-        shulkerEntity.setInvisible(true);
-        StatusEffectInstance instance = new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false);
-        shulkerEntity.addStatusEffect(instance);
-        player.getEntityWorld().spawnEntity(shulkerEntity);
+        //StatusEffectInstance instance = new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false);
+        //shulkerEntity.addStatusEffect(instance);
+        if (world.spawnEntity(shulkerEntity)) {
+            Constants.LOGGER.info("Shulker spawned!");
+        } else {
+            Constants.LOGGER.info("Shulker FAILED to spawn!");
+        }
 
         return shulkerEntity;
     }
 
     public static void setInvisibleShulkerArmorStandRider(ServerPlayerAPI player, ServerWorld world) {
-        // create Shulker (passenger)
-        player.downButNotOut$setInvisibleShulkerEntity(spawnInvisibleShulker((ServerPlayerEntity) player));
         // create ArmorStand (vehicle)
-        player.downButNotOut$setInvisibleArmorStandEntity(spawnInvisibleArmorStand((ServerPlayerEntity) player));
+        player.downButNotOut$setInvisibleArmorStandEntity(spawnInvisibleArmorStand(world));
+        // create Shulker (passenger)
+        player.downButNotOut$setInvisibleShulkerEntity(spawnInvisibleShulker(world));
         // spawn and mount
-        player.downButNotOut$getInvisibleShulkerEntity().startRiding(player.downButNotOut$getInvisibleArmorStandEntity(), true, true);
+        if (player.downButNotOut$getInvisibleShulkerEntity().startRiding(player.downButNotOut$getInvisibleArmorStandEntity(), true, true)) {
+            Constants.LOGGER.info("Shulker RIDING STARTED!");
+        } else {
+            Constants.LOGGER.info("Shulker RIDING FAILED!");
+        }
     }
 
     public static void cleanUpInvisibleEntities(ServerPlayerAPI player) {
