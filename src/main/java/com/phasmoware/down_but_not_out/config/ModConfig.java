@@ -12,6 +12,7 @@ public final class ModConfig {
     public boolean DOWNED_PLAYERS_HAVE_BLINDNESS_EFFECT = true;
     public boolean USE_CUSTOM_DOWNED_TEAMS = true;
     public boolean ALLOW_CHANGE_GAME_MODE = true;
+    public boolean SHOW_REVIVE_TAG_ABOVE_PLAYER = true;
     public long REVIVE_PENALTY_COOLDOWN_TICKS = 600L;
     public int REVIVE_PENALTY_MULTIPLIER = 4;
     public long BLEEDING_OUT_DURATION_TICKS = 900L;
