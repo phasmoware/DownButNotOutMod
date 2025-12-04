@@ -67,7 +67,7 @@ public class DownedUtility {
 
     public static void applyDownedState(ServerPlayerEntity player) {
         if (player != null) {
-            player.setHealth(Constants.HEARTS_AFTER_REVIVE);
+            player.setHealth(Constants.HEARTS_WHILE_DOWNED);
             player.addCommandTag(Constants.DOWNED_TAG);
             player.setInvulnerable(true);
             if (ModConfig.INSTANCE.ALLOW_CHANGE_GAME_MODE) {
@@ -125,8 +125,9 @@ public class DownedUtility {
         return armorStand;
     }
 
-    public static ShulkerEntity spawnInvisibleShulker(ServerWorld world) {
-        ShulkerEntity shulkerEntity = new ShulkerEntity(EntityType.SHULKER, world);
+    public static ShulkerEntity spawnInvisibleShulker(ServerPlayerEntity player) {
+        ShulkerEntity shulkerEntity = new ShulkerEntity(EntityType.SHULKER, player.getEntityWorld());
+        shulkerEntity.setPosition(player.getEntityPos());
         shulkerEntity.setInvulnerable(true);
         shulkerEntity.setNoGravity(true);
         shulkerEntity.setAiDisabled(true);
@@ -136,17 +137,19 @@ public class DownedUtility {
         EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
         attributeInstance.setBaseValue(Constants.MIN_ENTITY_SCALE);
 
+        shulkerEntity.setInvisible(true);
         StatusEffectInstance instance = new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false);
         shulkerEntity.addStatusEffect(instance);
-        world.spawnEntity(shulkerEntity);
+        player.getEntityWorld().spawnEntity(shulkerEntity);
+
         return shulkerEntity;
     }
 
     public static void setInvisibleShulkerArmorStandRider(ServerPlayerAPI player, ServerWorld world) {
+        // create Shulker (passenger)
+        player.downButNotOut$setInvisibleShulkerEntity(spawnInvisibleShulker((ServerPlayerEntity) player));
         // create ArmorStand (vehicle)
         player.downButNotOut$setInvisibleArmorStandEntity(spawnInvisibleArmorStand(world));
-        // create Shulker (passenger)
-        player.downButNotOut$setInvisibleShulkerEntity(spawnInvisibleShulker(world));
         // spawn and mount
         player.downButNotOut$getInvisibleShulkerEntity().startRiding(player.downButNotOut$getInvisibleArmorStandEntity(), true, true);
     }

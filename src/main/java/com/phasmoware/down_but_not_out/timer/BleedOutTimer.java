@@ -3,6 +3,7 @@ package com.phasmoware.down_but_not_out.timer;
 import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.manager.DownedStateManager;
+import com.phasmoware.down_but_not_out.util.Constants;
 import com.phasmoware.down_but_not_out.util.SoundUtility;
 import com.phasmoware.down_but_not_out.util.TeamUtility;
 import net.minecraft.entity.damage.DamageSource;
@@ -31,6 +32,7 @@ public class BleedOutTimer {
     public void tick() {
         if (isDowned(player)) {
             tickHeartbeats();
+            player.setHealth(Constants.HEARTS_WHILE_DOWNED);
             if (!playerIsGettingRevived()) {
                 TeamUtility.updateBleedOutStatusTeamColor(player, getCurrentProgress());
                 if (this.ticksUntilBleedOut > 0L && !playerIsGettingRevived()) {
