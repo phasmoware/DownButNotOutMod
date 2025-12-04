@@ -35,7 +35,7 @@ public class DownedStateManager {
         // original damageSource will be used for the death if possible
         serverPlayer.downButNotOut$getBleedOutTimer().setDamageSource(damageSource);
 
-        DownedUtility.setInvisibleShulkerArmorStandRider((ServerPlayerAPI) player, player.getEntityWorld());
+        DownedUtility.setInvisibleShulkerArmorStandRider((ServerPlayerAPI) player);
 
         if (ModConfig.INSTANCE.USE_CUSTOM_DOWNED_TEAMS) {
             TeamUtility.assignTempDownedTeam(player);
