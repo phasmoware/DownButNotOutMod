@@ -27,5 +27,4 @@ public interface ServerPlayerAPI {
     long downButNotOut$getTicksSinceLastUpdate();
 
     void downButNotOut$setTicksSinceLastUpdate(long ticksSinceLastUpdate);
-
 }

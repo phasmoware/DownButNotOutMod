@@ -4,10 +4,7 @@ import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.mixin.ArmorStandEntityAccessor;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -18,6 +15,7 @@ import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -113,9 +111,14 @@ public class DownedUtility {
         armorStand.setNoGravity(true);
         armorStand.setInvulnerable(true);
         armorStand.setSilent(true);
-        armorStand.setCustomNameVisible(false);
         ((ArmorStandEntityAccessor) armorStand).invokeSetMarker(true);
         ((ArmorStandEntityAccessor) armorStand).invokeSetSmall(true);
+        if (ModConfig.INSTANCE.SHOW_REVIVE_TAG_ABOVE_PLAYER) {
+            armorStand.setCustomNameVisible(true);
+            armorStand.setCustomName(Text.literal("◥REVIVE◤"));
+        } else {
+            armorStand.setCustomNameVisible(false);
+        }
         EntityAttributeInstance armorStandScale = armorStand.getAttributeInstance(EntityAttributes.SCALE);
         armorStandScale.setBaseValue(Constants.MIN_ENTITY_SCALE);
         world.spawnEntity(armorStand);
@@ -161,15 +164,12 @@ public class DownedUtility {
 
     public static void forceCrawlPose(ServerPlayerAPI serverPlayer) {
         ServerPlayerEntity player = (ServerPlayerEntity) serverPlayer;
-        player.setPose(EntityPose.SWIMMING);
-        if (!(player.getVelocity().equals(Constants.DOWNED_NOT_MOVING)) || !(player.getVelocity().equals(Vec3d.ZERO))) {
-            Vec3d headPosition = new Vec3d(player.getX(), player.getY(), player.getZ()).offset(Direction.UP, 1);
-            if (!player.isInFluid()) {
-                if (serverPlayer.downButNotOut$getInvisibleArmorStandEntity() != null && !serverPlayer.downButNotOut$getInvisibleArmorStandEntity().isRemoved()) {
-                    serverPlayer.downButNotOut$getInvisibleArmorStandEntity().setPosition(headPosition.x, headPosition.y, headPosition.z);
-                } else if (serverPlayer.downButNotOut$getInvisibleShulkerEntity() == null || serverPlayer.downButNotOut$getInvisibleShulkerEntity().isRemoved()) {
-                    DownedUtility.setInvisibleShulkerArmorStandRider(serverPlayer, player.getEntityWorld());
-                }
+        Vec3d headPosition = new Vec3d(player.getX(), player.getY(), player.getZ()).offset(Direction.UP, Constants.Y_OFFSET);
+        if (serverPlayer.downButNotOut$getInvisibleShulkerEntity().getEntityPos().squaredDistanceTo(headPosition) > 0.1) {
+            if (serverPlayer.downButNotOut$getInvisibleArmorStandEntity() != null && !serverPlayer.downButNotOut$getInvisibleArmorStandEntity().isRemoved()) {
+                serverPlayer.downButNotOut$getInvisibleArmorStandEntity().setPosition(headPosition.x, headPosition.y, headPosition.z);
+            } else if (serverPlayer.downButNotOut$getInvisibleShulkerEntity() == null || serverPlayer.downButNotOut$getInvisibleShulkerEntity().isRemoved()) {
+                DownedUtility.setInvisibleShulkerArmorStandRider(serverPlayer, player.getEntityWorld());
             }
         }
     }
