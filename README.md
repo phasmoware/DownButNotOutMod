@@ -82,6 +82,9 @@ To revive your downed friend, simply hold **right-click** with an empty hand on 
   // NOTE: team will not be changed if player is already part of team, regardless of this setting for compatability
   // Options: true, false
   "USE_CUSTOM_DOWNED_TEAMS": true,
+  // Makes a name tag with "◥REVIVE◤" hover above a downed player visible
+  // Options: true, false
+  "SHOW_REVIVE_TAG_ABOVE_PLAYER": true,
   // How many ticks the revive penalty lasts for after being revived (20 per second)
   // NOTE: after the cooldown the BLEEDING_OUT_DURATION_TICKS is reset
   // Min: 0, Max: 999999999999999999
