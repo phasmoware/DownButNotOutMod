@@ -21,8 +21,8 @@ public class Constants {
     public static final float DOWNED_SOUND_PITCH = 1.2F;
     public static final float REVIVED_SOUND_PITCH = 0.6F;
     public static final double MIN_ENTITY_SCALE = 0.0625d;
-    public static final float PLAYER_MAX_HEALTH = 1024.5f;
     public static final double Y_OFFSET = 0.95;
     public static final long UPDATE_MSG_SPAM_COOLDOWN = 15;
     public static final long REPEAT_MSG_SPAM_COOLDOWN = 60;
+    public static final String CUSTOM_REVIVE_TAG_ABOVE_NAME = "◥REVIVE◤";
 }

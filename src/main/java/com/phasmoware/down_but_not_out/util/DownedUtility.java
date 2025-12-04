@@ -14,7 +14,6 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -28,7 +27,7 @@ public class DownedUtility {
     public static void bleedOut(ServerPlayerEntity player, DamageSource damageSource) {
         player.setInvulnerable(false);
         if (damageSource != null) {
-            player.damage(player.getEntityWorld(), damageSource, Constants.PLAYER_MAX_HEALTH); // should not survive
+            player.damage(player.getEntityWorld(), damageSource, player.getHealth()); // should not survive
             if (!player.isDead()) {
                 player.kill(player.getEntityWorld());
             }
@@ -117,7 +116,7 @@ public class DownedUtility {
         ((ArmorStandEntityAccessor) armorStand).invokeSetSmall(true);
         if (ModConfig.INSTANCE.SHOW_REVIVE_TAG_ABOVE_PLAYER) {
             armorStand.setCustomNameVisible(true);
-            armorStand.setCustomName(Text.literal("◥REVIVE◤"));
+            armorStand.setCustomName(Text.literal(Constants.CUSTOM_REVIVE_TAG_ABOVE_NAME));
         } else {
             armorStand.setCustomNameVisible(false);
         }
@@ -147,7 +146,7 @@ public class DownedUtility {
         return shulkerEntity;
     }
 
-    public static void setInvisibleShulkerArmorStandRider(ServerPlayerAPI player, ServerWorld world) {
+    public static void setInvisibleShulkerArmorStandRider(ServerPlayerAPI player) {
         // create Shulker (passenger)
         player.downButNotOut$setInvisibleShulkerEntity(spawnInvisibleShulker((ServerPlayerEntity) player));
         // create ArmorStand (vehicle)
@@ -174,7 +173,7 @@ public class DownedUtility {
             if (serverPlayer.downButNotOut$getInvisibleArmorStandEntity() != null && !serverPlayer.downButNotOut$getInvisibleArmorStandEntity().isRemoved()) {
                 serverPlayer.downButNotOut$getInvisibleArmorStandEntity().setPosition(headPosition.x, headPosition.y, headPosition.z);
             } else if (serverPlayer.downButNotOut$getInvisibleShulkerEntity() == null || serverPlayer.downButNotOut$getInvisibleShulkerEntity().isRemoved()) {
-                DownedUtility.setInvisibleShulkerArmorStandRider(serverPlayer, player.getEntityWorld());
+                DownedUtility.setInvisibleShulkerArmorStandRider(serverPlayer);
             }
         }
     }
