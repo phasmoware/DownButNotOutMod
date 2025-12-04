@@ -124,7 +124,7 @@ To revive your downed friend, simply hold **right-click** with an empty hand on 
 
 Geyser Bedrock Clients:
 
-- get slowly pushed around instead of crawling
+- slowly walk instead of crawling
 - can't see glowing effect on downed players
 
 Vanilla Clients:
