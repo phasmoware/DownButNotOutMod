@@ -47,7 +47,7 @@ public class TeamUtility {
                 team.setDisplayName(teamDisplayName);
                 team.setFriendlyFireAllowed(true);
                 team.setShowFriendlyInvisibles(false);
-                team.setCollisionRule(AbstractTeam.CollisionRule.PUSH_OWN_TEAM);
+                //team.setCollisionRule(AbstractTeam.CollisionRule.PUSH_OWN_TEAM);
                 team.setColor(Formatting.DARK_RED);
             }
 
