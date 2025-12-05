@@ -1,6 +1,6 @@
 package com.phasmoware.down_but_not_out.timer;
 
-import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
+import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerEntityDuck;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.manager.DownedStateManager;
 import com.phasmoware.down_but_not_out.util.Constants;
@@ -111,6 +111,6 @@ public class BleedOutTimer {
     }
 
     private boolean playerIsGettingRevived() {
-        return ((ServerPlayerAPI) player).downButNotOut$getReviveTimer().isInteractionActive();
+        return ((ServerPlayerEntityDuck) player).downButNotOut$getReviveTimer().isInteractionActive();
     }
 }

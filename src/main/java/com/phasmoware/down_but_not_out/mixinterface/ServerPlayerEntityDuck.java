@@ -1,4 +1,4 @@
-package com.phasmoware.down_but_not_out.api;
+package com.phasmoware.down_but_not_out.mixinterface;
 
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
@@ -6,7 +6,7 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.text.Text;
 
-public interface ServerPlayerAPI {
+public interface ServerPlayerEntityDuck {
 
     BleedOutTimer downButNotOut$getBleedOutTimer();
 

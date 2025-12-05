@@ -1,6 +1,6 @@
 package com.phasmoware.down_but_not_out.manager;
 
-import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
+import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerEntityDuck;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.handler.MessageHandler;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
@@ -19,10 +19,10 @@ public class DownedStateManager {
 
 
     public static void onDeathEventOfDownedPlayer(ServerPlayerEntity player, DamageSource damageSource) {
-        ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
+        ServerPlayerEntityDuck serverPlayer = (ServerPlayerEntityDuck) player;
         serverPlayer.downButNotOut$getBleedOutTimer().reset();
         DownedUtility.removeDownedState(player);
-        DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI) player);
+        DownedUtility.cleanUpInvisibleEntities((ServerPlayerEntityDuck) player);
         Text bledOutMessage = Text.literal(Constants.BLED_OUT_MSG).formatted(Formatting.RED);
         MessageHandler.sendUpdateMessage(bledOutMessage, player);
     }
@@ -30,12 +30,12 @@ public class DownedStateManager {
     public static void onPlayerDownedEvent(ServerPlayerEntity player, DamageSource damageSource) {
         DownedUtility.applyDownedState(player);
         SoundUtility.playDownedSound(player);
-        ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
+        ServerPlayerEntityDuck serverPlayer = (ServerPlayerEntityDuck) player;
 
         // original damageSource will be used for the death if possible
         serverPlayer.downButNotOut$getBleedOutTimer().setDamageSource(damageSource);
 
-        DownedUtility.setInvisibleShulkerArmorStandRider((ServerPlayerAPI) player);
+        DownedUtility.setInvisibleShulkerArmorStandRider((ServerPlayerEntityDuck) player);
 
         if (ModConfig.INSTANCE.USE_CUSTOM_DOWNED_TEAMS) {
             TeamUtility.assignTempDownedTeam(player);
@@ -55,21 +55,21 @@ public class DownedStateManager {
 
     public static void onBleedOutEvent(ServerPlayerEntity player, DamageSource damageSource) {
         DownedUtility.bleedOut(player, damageSource);
-        DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI) player);
+        DownedUtility.cleanUpInvisibleEntities((ServerPlayerEntityDuck) player);
     }
 
     public static void onReviveComplete(ServerPlayerEntity player, ServerPlayerEntity reviver) {
         MessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() +
                 Constants.REVIVED_MSG + player.getName().getLiteralString(), player.getEntityWorld(), Formatting.GREEN);
-        ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
+        ServerPlayerEntityDuck serverPlayer = (ServerPlayerEntityDuck) player;
         DownedUtility.applyRevivedPenalty(serverPlayer);
         SoundUtility.playRevivedSound(player);
         DownedUtility.removeDownedState(player);
-        DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI) player);
+        DownedUtility.cleanUpInvisibleEntities((ServerPlayerEntityDuck) player);
     }
 
     public static void onReviveInteractionEvent(ServerPlayerEntity downed, ServerPlayerEntity reviver) {
-        ServerPlayerAPI downedPlayer = (ServerPlayerAPI) downed;
+        ServerPlayerEntityDuck downedPlayer = (ServerPlayerEntityDuck) downed;
         ReviveTimer reviveTimer = downedPlayer.downButNotOut$getReviveTimer();
         reviveTimer.continueRevive(reviver);
     }

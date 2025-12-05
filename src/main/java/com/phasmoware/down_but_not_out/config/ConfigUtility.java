@@ -25,7 +25,7 @@ public final class ConfigUtility {
         File file = directoryPath.resolve(CONF_FILE).toFile();
         if (!file.exists()) {
             Files.createFile(filePath);
-            saveConfig(filePath, new DefaultModConfig());
+            saveConfig(filePath, new ModConfig());
             file = directoryPath.resolve(CONF_FILE).toFile();
         }
         return file;
@@ -44,7 +44,7 @@ public final class ConfigUtility {
         }
     }
 
-    private static void saveConfig(Path filePath, DefaultModConfig config) {
+    private static void saveConfig(Path filePath, ModConfig config) {
         try {
             Files.writeString(filePath, GSON.toJson(config));
         } catch (IOException e) {

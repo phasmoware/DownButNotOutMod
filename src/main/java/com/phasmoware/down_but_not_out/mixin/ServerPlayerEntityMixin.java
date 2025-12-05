@@ -1,7 +1,7 @@
 package com.phasmoware.down_but_not_out.mixin;
 
 import com.mojang.authlib.GameProfile;
-import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
+import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerEntityDuck;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import com.phasmoware.down_but_not_out.util.DownedUtility;
@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerPlayerAPI {
+public abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerPlayerEntityDuck {
 
     @Unique
     private final BleedOutTimer bleedOutTimer = new BleedOutTimer((ServerPlayerEntity) (Object) this);

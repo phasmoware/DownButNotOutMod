@@ -1,6 +1,6 @@
 package com.phasmoware.down_but_not_out.handler;
 
-import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
+import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerEntityDuck;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.manager.DownedStateManager;
 import com.phasmoware.down_but_not_out.util.DownedUtility;
@@ -62,14 +62,14 @@ public class EventCallbackHandler {
     }
 
     public static void onCleanUpEvent(PlayerEntity playerEntity) {
-        DownedUtility.cleanUpInvisibleEntities((ServerPlayerAPI) playerEntity);
+        DownedUtility.cleanUpInvisibleEntities((ServerPlayerEntityDuck) playerEntity);
         TeamUtility.removeTempDownedTeam((ServerPlayerEntity) playerEntity);
     }
 
     public static void onPlayerJoinWhileDowned(ServerPlayerEntity serverPlayer) {
         if (isDowned(serverPlayer)) {
             DownedStateManager.onPlayerDownedEvent(serverPlayer, null);
-            DownedUtility.applyRevivedPenalty((ServerPlayerAPI) serverPlayer);
+            DownedUtility.applyRevivedPenalty((ServerPlayerEntityDuck) serverPlayer);
         }
     }
 }

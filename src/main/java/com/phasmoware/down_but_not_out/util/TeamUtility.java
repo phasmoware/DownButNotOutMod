@@ -1,6 +1,6 @@
 package com.phasmoware.down_but_not_out.util;
 
-import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
+import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerEntityDuck;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.scoreboard.AbstractTeam;
@@ -96,7 +96,7 @@ public class TeamUtility {
     }
 
     public static void assignShulkerAndArmorStandToTempDownedTeam(ServerPlayerEntity player) {
-        ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
+        ServerPlayerEntityDuck serverPlayer = (ServerPlayerEntityDuck) player;
         ShulkerEntity shulker = serverPlayer.downButNotOut$getInvisibleShulkerEntity();
         ArmorStandEntity armorstand = serverPlayer.downButNotOut$getInvisibleArmorStandEntity();
         Scoreboard scoreboard = player.getEntityWorld().getScoreboard();

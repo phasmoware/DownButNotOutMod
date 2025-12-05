@@ -1,6 +1,6 @@
 package com.phasmoware.down_but_not_out.util;
 
-import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
+import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerEntityDuck;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.mixin.ArmorStandEntityAccessor;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
@@ -146,7 +146,7 @@ public class DownedUtility {
         return shulkerEntity;
     }
 
-    public static void setInvisibleShulkerArmorStandRider(ServerPlayerAPI player) {
+    public static void setInvisibleShulkerArmorStandRider(ServerPlayerEntityDuck player) {
         // create Shulker (passenger)
         player.downButNotOut$setInvisibleShulkerEntity(spawnInvisibleShulker((ServerPlayerEntity) player));
         // create ArmorStand (vehicle)
@@ -155,7 +155,7 @@ public class DownedUtility {
         player.downButNotOut$getInvisibleShulkerEntity().startRiding(player.downButNotOut$getInvisibleArmorStandEntity(), true, true);
     }
 
-    public static void cleanUpInvisibleEntities(ServerPlayerAPI player) {
+    public static void cleanUpInvisibleEntities(ServerPlayerEntityDuck player) {
         if (player.downButNotOut$getInvisibleShulkerEntity() != null) {
             player.downButNotOut$getInvisibleShulkerEntity().remove(Entity.RemovalReason.DISCARDED);
             player.downButNotOut$setInvisibleShulkerEntity(null);
@@ -166,7 +166,7 @@ public class DownedUtility {
         }
     }
 
-    public static void forceCrawlPose(ServerPlayerAPI serverPlayer) {
+    public static void forceCrawlPose(ServerPlayerEntityDuck serverPlayer) {
         ServerPlayerEntity player = (ServerPlayerEntity) serverPlayer;
         Vec3d headPosition = new Vec3d(player.getX(), player.getY(), player.getZ()).offset(Direction.UP, Constants.Y_OFFSET);
         if (serverPlayer.downButNotOut$getInvisibleShulkerEntity().getEntityPos().squaredDistanceTo(headPosition) > 0.1) {
@@ -178,7 +178,7 @@ public class DownedUtility {
         }
     }
 
-    public static void applyRevivedPenalty(ServerPlayerAPI player) {
+    public static void applyRevivedPenalty(ServerPlayerEntityDuck player) {
         BleedOutTimer timer = player.downButNotOut$getBleedOutTimer();
         if (ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS > 0 && timer.getTicksUntilBleedOut() > 1) {
             player.downButNotOut$getBleedOutTimer().setReviveCooldownTicks(ModConfig.INSTANCE.REVIVE_PENALTY_COOLDOWN_TICKS);

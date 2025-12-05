@@ -1,6 +1,6 @@
 package com.phasmoware.down_but_not_out.handler;
 
-import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
+import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerEntityDuck;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.util.Constants;
 import net.minecraft.server.command.ServerCommandSource;
@@ -32,7 +32,7 @@ public class MessageHandler {
     }
 
     public static void sendThrottledUpdateMessage(Text message, ServerPlayerEntity player) {
-        ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
+        ServerPlayerEntityDuck serverPlayer = (ServerPlayerEntityDuck) player;
         if (ModConfig.INSTANCE.USE_OVERLAY_MESSAGES || serverPlayer.downButNotOut$getTicksSinceLastUpdate() > Constants.UPDATE_MSG_SPAM_COOLDOWN) {
             serverPlayer.downButNotOut$setTicksSinceLastUpdate(0);
             sendUpdateMessage(message, player);
@@ -40,7 +40,7 @@ public class MessageHandler {
     }
 
     public static void sendUpdateMessage(Text message, ServerPlayerEntity player) {
-        ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
+        ServerPlayerEntityDuck serverPlayer = (ServerPlayerEntityDuck) player;
         if (!message.equals(serverPlayer.downButNotOut$getLastUpdateText()) || serverPlayer.downButNotOut$getTicksSinceLastUpdate() > Constants.REPEAT_MSG_SPAM_COOLDOWN) {
             serverPlayer.downButNotOut$setLastUpdateText(message);
             player.sendMessage(message, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
