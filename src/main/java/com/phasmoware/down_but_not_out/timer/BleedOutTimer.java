@@ -32,7 +32,7 @@ public class BleedOutTimer {
     public void tick() {
         if (isDowned(player)) {
             tickHeartbeats();
-            player.setHealth(Constants.HEARTS_WHILE_DOWNED);
+            updateDownedHealthAndHunger();
             if (playerIsNotGettingRevived()) {
                 TeamUtility.updateBleedOutStatusTeamColor(player, getCurrentProgress());
                 if (this.ticksUntilBleedOut > 0L && playerIsNotGettingRevived()) {
@@ -86,6 +86,16 @@ public class BleedOutTimer {
         // pitch slows down heartbeat as bleed out progresses
         float pitch = Math.max(0f, 1f - getCurrentProgress());
         SoundUtility.playHeartBeatSound(this.player, pitch);
+    }
+
+    private void updateDownedHealthAndHunger() {
+        // set food level to 17 to stop constant healing and damage
+        if (player.getHungerManager().getFoodLevel() > Constants.NON_HEALING_FOOD_LEVEL) {
+            player.getHungerManager().setFoodLevel(Constants.NON_HEALING_FOOD_LEVEL);
+        }
+        if (player.getHealth() != Constants.HEARTS_WHILE_DOWNED) {
+            player.setHealth(Constants.HEARTS_WHILE_DOWNED);
+        }
     }
 
     public void reset() {

@@ -34,4 +34,5 @@ public class Constants {
     public static final long REPEAT_MSG_SPAM_COOLDOWN = 60;
     public static final int MIN_HEARTBEAT_INTERVAL = 10;
     public static final int MAX_HEARTBEAT_INTERVAL = 100;
+    public static final int NON_HEALING_FOOD_LEVEL = 17;
 }

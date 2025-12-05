@@ -14,21 +14,21 @@ import net.minecraft.util.Formatting;
 public class MessageHandler {
 
     public static void sendClickableGiveUpMessage(ServerPlayerEntity player) {
-        player.sendMessage(Text.literal("Click ").styled(style -> style
+        player.sendMessage(Text.literal("Click or type ").styled(style -> style
                 .withBold(true)
                 .withItalic(true)
-                .withColor(Formatting.DARK_GRAY))
-                .append(Text.literal("[HERE]")
+                .withColor(Formatting.GRAY))
+                .append(Text.literal("/" + Constants.COMMAND_STRING)
                         .styled(style -> style
-                                .withColor(Formatting.AQUA)
+                                .withColor(Formatting.RED)
                                 .withUnderline(true).withBold(true)
                                 .withClickEvent(new ClickEvent.RunCommand(Constants.COMMAND_STRING))
                                 .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run Command /" + Constants.COMMAND_STRING)))))
-                .append(Text.literal(" or type /" + Constants.COMMAND_STRING + " to give up and respawn")
+                .append(Text.literal(" to give up and respawn")
                         .styled(style -> style
                                 .withBold(true).
                                 withItalic(true)
-                                .withColor(Formatting.DARK_GRAY))), false); // can't be an overlay with a click event
+                                .withColor(Formatting.GRAY))), false); // can't be an overlay with a click event
     }
 
     public static void sendThrottledUpdateMessage(Text message, ServerPlayerEntity player) {
