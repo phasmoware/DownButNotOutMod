@@ -16,12 +16,16 @@ public class DownedUtility {
 
     public static void bleedOut(ServerPlayerEntity player, DamageSource damageSource) {
         player.setInvulnerable(false);
+        // clear status effects to ensure that they are not invulnerable to the damage source type
+        player.clearStatusEffects();
         if (damageSource != null) {
-            player.damage(player.getEntityWorld(), damageSource, player.getHealth()); // should not survive
-            if (!player.isDead()) {
-                player.kill(player.getEntityWorld());
-            }
+            player.damage(player.getEntityWorld(), damageSource, 0.1f); // should not survive
         } else {
+            // if damage source is null (because player logged out or because server restarted) try setting wither DamageSource
+            player.damage(player.getEntityWorld(), player.getEntityWorld().getDamageSources().wither(), 0.1f);
+        }
+        if (!player.isDead()) {
+            // if player somehow survived with temporary health or something, fall back to kill command
             player.kill(player.getEntityWorld());
         }
     }

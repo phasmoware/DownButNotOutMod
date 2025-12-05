@@ -23,7 +23,7 @@ public class Constants {
     public static final Text REVIVE_CANCELED_TEXT = Text.literal("Revive canceled!").formatted(Formatting.RED);
     public static final Text USE_EMPTY_HAND_TO_REVIVE_TEXT = Text.literal("Use a free hand to revive them!").formatted(Formatting.RED);
     public static final Text TOO_FAR_AWAY_TO_REVIVE_TEXT = Text.literal("Too far away to revive them!").formatted(Formatting.RED);
-    public static final float HEARTS_WHILE_DOWNED = 0.5f;
+    public static final float HEARTS_WHILE_DOWNED = 0.000001f;
     public static final float BASE_MOVE_SPEED = 0.1f;
     public static final float DOWNED_SOUND_PITCH = 1.2f;
     public static final float REVIVED_SOUND_PITCH = 0.6f;
