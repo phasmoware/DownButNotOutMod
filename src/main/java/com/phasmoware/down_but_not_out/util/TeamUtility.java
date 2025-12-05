@@ -1,6 +1,6 @@
 package com.phasmoware.down_but_not_out.util;
 
-import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerEntityDuck;
+import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.scoreboard.AbstractTeam;
@@ -20,14 +20,6 @@ public class TeamUtility {
         return team.getName().equals(getTempDownedTeamName(player));
     }
 
-    public static boolean isOnATeamAlready(ServerPlayerEntity player) {
-        Team team = player.getScoreboardTeam();
-        if (team == null) {
-            return false;
-        }
-        return !team.getName().equals(getTempDownedTeamName(player));
-    }
-
     public static String getTempDownedTeamName(ServerPlayerEntity player) {
         return Constants.MOD_ABBREV_PREFIX + player.getUuidAsString();
     }
@@ -37,6 +29,8 @@ public class TeamUtility {
     }
 
     public static void assignTempDownedTeam(ServerPlayerEntity player) {
+        // player can only be on one team so we should not overwrite a current team
+        // only applies if player is not part of a different team already
         if (player.getScoreboardTeam() == null) {
             Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
             String teamName = getTempDownedTeamName(player);
@@ -96,12 +90,12 @@ public class TeamUtility {
     }
 
     public static void assignShulkerAndArmorStandToTempDownedTeam(ServerPlayerEntity player) {
-        ServerPlayerEntityDuck serverPlayer = (ServerPlayerEntityDuck) player;
-        ShulkerEntity shulker = serverPlayer.downButNotOut$getInvisibleShulkerEntity();
-        ArmorStandEntity armorstand = serverPlayer.downButNotOut$getInvisibleArmorStandEntity();
+        ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
+        ShulkerEntity shulker = serverPlayer.dbno$getInvisibleShulkerEntity();
+        ArmorStandEntity armorStandEntity = serverPlayer.dbno$getInvisibleArmorStandEntity();
         Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
         Team team = player.getScoreboardTeam();
         scoreboard.addScoreHolderToTeam(shulker.getNameForScoreboard(), team);
-        scoreboard.addScoreHolderToTeam(armorstand.getNameForScoreboard(), team);
+        scoreboard.addScoreHolderToTeam(armorStandEntity.getNameForScoreboard(), team);
     }
 }

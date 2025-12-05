@@ -2,7 +2,7 @@ package com.phasmoware.down_but_not_out;
 
 import com.phasmoware.down_but_not_out.command.ModCommands;
 import com.phasmoware.down_but_not_out.config.ModConfig;
-import com.phasmoware.down_but_not_out.listener.EventCallbackListener;
+import com.phasmoware.down_but_not_out.registry.EventCallbackListener;
 import com.phasmoware.down_but_not_out.util.Constants;
 import net.fabricmc.api.ModInitializer;
 

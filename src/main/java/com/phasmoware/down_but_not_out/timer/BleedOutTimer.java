@@ -1,8 +1,8 @@
 package com.phasmoware.down_but_not_out.timer;
 
-import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerEntityDuck;
+import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import com.phasmoware.down_but_not_out.config.ModConfig;
-import com.phasmoware.down_but_not_out.manager.DownedStateManager;
+import com.phasmoware.down_but_not_out.StateManager;
 import com.phasmoware.down_but_not_out.util.Constants;
 import com.phasmoware.down_but_not_out.util.SoundUtility;
 import com.phasmoware.down_but_not_out.util.TeamUtility;
@@ -33,12 +33,12 @@ public class BleedOutTimer {
         if (isDowned(player)) {
             tickHeartbeats();
             player.setHealth(Constants.HEARTS_WHILE_DOWNED);
-            if (!playerIsGettingRevived()) {
+            if (playerIsNotGettingRevived()) {
                 TeamUtility.updateBleedOutStatusTeamColor(player, getCurrentProgress());
-                if (this.ticksUntilBleedOut > 0L && !playerIsGettingRevived()) {
+                if (this.ticksUntilBleedOut > 0L && playerIsNotGettingRevived()) {
                     --this.ticksUntilBleedOut;
                     if (this.ticksUntilBleedOut == 0L) {
-                        DownedStateManager.onBleedOutEvent(player, damageSource);
+                        StateManager.onBleedOutEvent(player, damageSource);
                         reset();
                     }
                 }
@@ -49,7 +49,7 @@ public class BleedOutTimer {
     }
 
     // starts downed at 0.0 progress and ends at bleed out at 1f progress
-    // for infinite downed ticks (-1f) just return 1f
+    // for infinite downed ticks (-1f) just return 1f progress
     private float getCurrentProgress() {
         if (ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS < 0L) {
             return 1f;
@@ -58,13 +58,12 @@ public class BleedOutTimer {
     }
 
     private void tickHeartbeats() {
-        // disabled if Max Heartbeat volume is set to less than 0
+        // disabled if Max Heartbeat volume is set to less than or equal to 0
         if (ModConfig.INSTANCE.HEARTBEAT_SOUND_VOLUME > 0) {
             float currentProgress = getCurrentProgress();
 
-            // interval of 5 ticks min and 100 ticks max between heartbeats
-            // interval grows larger towards the end of the progress
-            int nextHeartbeatInterval = (int) (10 + (90 * currentProgress));
+            // interval between heartbeats in ticks grows larger towards the end of the bleed out progress
+            int nextHeartbeatInterval = (int) (Constants.MIN_HEARTBEAT_INTERVAL + (Constants.MAX_HEARTBEAT_INTERVAL * currentProgress));
 
             if (heartbeatCooldownTicks <= 0) {
                 playHeartbeatSound();
@@ -84,7 +83,7 @@ public class BleedOutTimer {
     }
 
     private void playHeartbeatSound() {
-        // pitch slows down heartbeat as bleed out timer progresses
+        // pitch slows down heartbeat as bleed out progresses
         float pitch = Math.max(0f, 1f - getCurrentProgress());
         SoundUtility.playHeartBeatSound(this.player, pitch);
     }
@@ -110,7 +109,7 @@ public class BleedOutTimer {
         this.reviveCooldownTicks = reviveCooldownTicks;
     }
 
-    private boolean playerIsGettingRevived() {
-        return ((ServerPlayerEntityDuck) player).downButNotOut$getReviveTimer().isInteractionActive();
+    private boolean playerIsNotGettingRevived() {
+        return !((ServerPlayerDuck) player).dbno$getReviveTimer().isInteractionActive();
     }
 }

@@ -1,4 +1,4 @@
-package com.phasmoware.down_but_not_out.listener;
+package com.phasmoware.down_but_not_out.registry;
 
 import com.phasmoware.down_but_not_out.handler.EventCallbackHandler;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -7,27 +7,27 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.*;
 
 
-public class EventCallbackListener {
+public class ModEvents {
 
-    public static void registerEventCallbacks() {
-        listenForDeathEvent();
-        listenForInteractionWhileDowned();
-        listenForReviveInteractionEvent();
-        listenForPlayerDisconnect();
-        listenForServerCleanUpEvent();
-        listenForPlayerReconnect();
+    public static void init() {
+        registerServerCleanUpEvent();
+        registerAllowDeathEvent();
+        registerInteractionEventsWhileDowned();
+        registerReviveInteractionEvent();
+        registerServerPlayerDisconnectEvent();
+        registerServerPlayerJoinEvent();
     }
 
-    private static void listenForServerCleanUpEvent() {
+    private static void registerServerCleanUpEvent() {
         ServerLifecycleEvents.SERVER_STOPPING.register(server ->
                 server.getPlayerManager().getPlayerList().forEach(EventCallbackHandler::onCleanUpEvent));
     }
 
-    private static void listenForDeathEvent() {
+    private static void registerAllowDeathEvent() {
         ServerLivingEntityEvents.ALLOW_DEATH.register(EventCallbackHandler::onAllowDeathEvent);
     }
 
-    private static void listenForInteractionWhileDowned() {
+    private static void registerInteractionEventsWhileDowned() {
 
         // prevent left click block interaction while downed
         AttackBlockCallback.EVENT.register((playerEntity, world, hand, blockPos, direction) ->
@@ -46,15 +46,15 @@ public class EventCallbackListener {
                 EventCallbackHandler.onConsumeDownedAction(playerEntity));
     }
 
-    private static void listenForReviveInteractionEvent() {
+    private static void registerReviveInteractionEvent() {
         UseEntityCallback.EVENT.register(EventCallbackHandler::onReviveDownedInteraction);
     }
 
-    private static void listenForPlayerDisconnect() {
+    private static void registerServerPlayerDisconnectEvent() {
         ServerPlayerEvents.LEAVE.register(EventCallbackHandler::onCleanUpEvent);
     }
 
-    private static void listenForPlayerReconnect() {
+    private static void registerServerPlayerJoinEvent() {
         ServerPlayerEvents.JOIN.register(EventCallbackHandler::onPlayerJoinWhileDowned);
     }
 }

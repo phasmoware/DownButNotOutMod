@@ -1,4 +1,4 @@
-package com.phasmoware.down_but_not_out.listener;
+package com.phasmoware.down_but_not_out.registry;
 
 import com.phasmoware.down_but_not_out.handler.EventCallbackHandler;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;

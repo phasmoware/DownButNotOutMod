@@ -1,10 +1,10 @@
 package com.phasmoware.down_but_not_out.mixin;
 
 import com.mojang.authlib.GameProfile;
-import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerEntityDuck;
+import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
-import com.phasmoware.down_but_not_out.util.DownedUtility;
+import com.phasmoware.down_but_not_out.util.ServerCrawlUtility;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerPlayerEntityDuck {
+public abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerPlayerDuck {
 
     @Unique
     private final BleedOutTimer bleedOutTimer = new BleedOutTimer((ServerPlayerEntity) (Object) this);
@@ -51,59 +51,57 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
         reviveTimer.tick();
         bleedOutTimer.tick();
         if (isDowned(this)) {
-            // keep an invisible ShulkerEntity riding an ArmorStandEntity at player's head to force crawling pose
-            // (server side workaround)
-            DownedUtility.forceCrawlPose(this);
+            ServerCrawlUtility.forceCrawlPose(this);
         }
     }
 
     @Override
-    public BleedOutTimer downButNotOut$getBleedOutTimer() {
+    public BleedOutTimer dbno$getBleedOutTimer() {
         return this.bleedOutTimer;
     }
 
     @Override
-    public ReviveTimer downButNotOut$getReviveTimer() {
+    public ReviveTimer dbno$getReviveTimer() {
         return this.reviveTimer;
     }
 
     @Override
-    public ShulkerEntity downButNotOut$getInvisibleShulkerEntity() {
+    public ShulkerEntity dbno$getInvisibleShulkerEntity() {
         return this.invisibleShulkerEntity;
     }
 
     @Override
-    public void downButNotOut$setInvisibleShulkerEntity(ShulkerEntity shulkerEntity) {
+    public void dbno$setInvisibleShulkerEntity(ShulkerEntity shulkerEntity) {
         this.invisibleShulkerEntity = shulkerEntity;
     }
 
     @Override
-    public ArmorStandEntity downButNotOut$getInvisibleArmorStandEntity() {
+    public ArmorStandEntity dbno$getInvisibleArmorStandEntity() {
         return this.invisibleArmorStandEntity;
     }
 
     @Override
-    public void downButNotOut$setInvisibleArmorStandEntity(ArmorStandEntity armorStandEntity) {
+    public void dbno$setInvisibleArmorStandEntity(ArmorStandEntity armorStandEntity) {
         this.invisibleArmorStandEntity = armorStandEntity;
     }
 
     @Override
-    public Text downButNotOut$getLastUpdateText() {
+    public Text dbno$getLastUpdateText() {
         return this.lastUpdateText;
     }
 
     @Override
-    public void downButNotOut$setLastUpdateText(Text lastText) {
+    public void dbno$setLastUpdateText(Text lastText) {
         this.lastUpdateText = lastText;
     }
 
     @Override
-    public long downButNotOut$getTicksSinceLastUpdate() {
+    public long dbno$getTicksSinceLastUpdate() {
         return this.ticksSinceLastUpdate;
     }
 
     @Override
-    public void downButNotOut$setTicksSinceLastUpdate(long ticksSinceLastUpdate) {
+    public void dbno$setTicksSinceLastUpdate(long ticksSinceLastUpdate) {
         this.ticksSinceLastUpdate = ticksSinceLastUpdate;
     }
 }

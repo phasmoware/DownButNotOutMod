@@ -3,6 +3,7 @@ package com.phasmoware.down_but_not_out.config;
 public final class ModConfig {
     public static ModConfig INSTANCE;
 
+    // default values set here
     public boolean MOD_ENABLED = true;
     public boolean SKIP_DOWNED_STATE_IF_NO_OTHER_PLAYERS_ONLINE = true;
     public boolean REVIVING_REQUIRES_EMPTY_HAND = true;

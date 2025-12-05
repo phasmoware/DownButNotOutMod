@@ -1,9 +1,10 @@
 package com.phasmoware.down_but_not_out.handler;
 
-import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerEntityDuck;
+import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import com.phasmoware.down_but_not_out.config.ModConfig;
-import com.phasmoware.down_but_not_out.manager.DownedStateManager;
-import com.phasmoware.down_but_not_out.util.DownedUtility;
+import com.phasmoware.down_but_not_out.StateManager;
+import com.phasmoware.down_but_not_out.util.ReviveUtility;
+import com.phasmoware.down_but_not_out.util.ServerCrawlUtility;
 import com.phasmoware.down_but_not_out.util.TeamUtility;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -28,19 +29,19 @@ public class EventCallbackHandler {
             return true;
         }
         if (isDowned(player)) {
-            DownedStateManager.onDeathEventOfDownedPlayer(player, damageSource);
+            StateManager.onDeathEventOfDownedPlayer(player, damageSource);
             return true;
         }
         if (player.isInLava() && player.isOnFire() && !ModConfig.INSTANCE.ALLOW_DOWNED_STATE_IN_LAVA) {
-            DownedStateManager.onPlayerDownedInLava(player);
+            MessageHandler.onPlayerDownedInLava(player);
             return true;
         }
         if (ModConfig.INSTANCE.SKIP_DOWNED_STATE_IF_NO_OTHER_PLAYERS_ONLINE && player.getEntityWorld().getServer().getCurrentPlayerCount() <= 1) {
-            DownedStateManager.onPlayerDownedInEmptyServer(player);
+            StateManager.onPlayerDownedInEmptyServer(player);
             return true;
         }
         // else prevent death and apply downed state instead
-        DownedStateManager.onPlayerDownedEvent(player, damageSource);
+        StateManager.onPlayerDownedEvent(player, damageSource);
         return false;
     }
 
@@ -56,20 +57,20 @@ public class EventCallbackHandler {
             return ActionResult.CONSUME;
         } else if (entity instanceof ServerPlayerEntity downed && (isDowned(entity))) {
             ServerPlayerEntity reviver = (ServerPlayerEntity) playerEntity;
-            DownedStateManager.onReviveInteractionEvent(downed, reviver);
+            StateManager.onReviveInteractionEvent(downed, reviver);
         }
         return ActionResult.PASS;
     }
 
     public static void onCleanUpEvent(PlayerEntity playerEntity) {
-        DownedUtility.cleanUpInvisibleEntities((ServerPlayerEntityDuck) playerEntity);
+        ServerCrawlUtility.cleanUpForceCrawlEntities((ServerPlayerDuck) playerEntity);
         TeamUtility.removeTempDownedTeam((ServerPlayerEntity) playerEntity);
     }
 
     public static void onPlayerJoinWhileDowned(ServerPlayerEntity serverPlayer) {
         if (isDowned(serverPlayer)) {
-            DownedStateManager.onPlayerDownedEvent(serverPlayer, null);
-            DownedUtility.applyRevivedPenalty((ServerPlayerEntityDuck) serverPlayer);
+            StateManager.onPlayerDownedEvent(serverPlayer, null);
+            ReviveUtility.applyRevivedPenalty((ServerPlayerDuck) serverPlayer);
         }
     }
 }
