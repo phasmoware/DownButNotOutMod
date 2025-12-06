@@ -1,5 +1,6 @@
 package com.phasmoware.down_but_not_out.timer;
 
+import com.phasmoware.down_but_not_out.handler.MessageHandler;
 import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.StateManager;
@@ -8,12 +9,15 @@ import com.phasmoware.down_but_not_out.util.SoundUtility;
 import com.phasmoware.down_but_not_out.util.TeamUtility;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
 
 public class BleedOutTimer {
+
+    public static final String BLEEDING_TIMER_MSG = "Bleeding Out in: ";
 
     @NotNull
     private final ServerPlayerEntity player;
@@ -34,6 +38,7 @@ public class BleedOutTimer {
             tickHeartbeats();
             updateDownedHealthAndHunger();
             if (playerIsNotGettingRevived()) {
+                updateSecondsUntilBleedOut();
                 TeamUtility.updateBleedOutStatusTeamColor(player, getCurrentProgress());
                 if (this.ticksUntilBleedOut > 0L && playerIsNotGettingRevived()) {
                     --this.ticksUntilBleedOut;
@@ -101,6 +106,17 @@ public class BleedOutTimer {
     public void reset() {
         this.ticksUntilBleedOut = ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS;
         this.damageSource = null;
+    }
+
+    private void updateSecondsUntilBleedOut() {
+        if (ticksUntilBleedOut % 20 == 0) {
+            ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
+            if (ModConfig.INSTANCE.SHOW_REVIVE_TAG_ABOVE_PLAYER) {
+                serverPlayer.dbno$getInvisibleArmorStandEntity().setCustomName(Text.literal(Constants.CUSTOM_REVIVE_TAG_ABOVE_NAME + " " + (ticksUntilBleedOut / 20) + "s"));
+                serverPlayer.dbno$getInvisibleArmorStandEntity().setCustomNameVisible(true);
+            }
+            MessageHandler.sendThrottledUpdateMessage(Text.literal(BLEEDING_TIMER_MSG + (ticksUntilBleedOut / 20) + "s").formatted(TeamUtility.getProgressColor(getCurrentProgress())), player);
+        }
     }
 
     public long getTicksUntilBleedOut() {

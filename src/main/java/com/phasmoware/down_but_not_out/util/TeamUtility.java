@@ -74,18 +74,22 @@ public class TeamUtility {
     }
 
     public static void updateBleedOutStatusTeamColor(ServerPlayerEntity player, float progress) {
+        updateTempTeamColor(player, getProgressColor(progress));
+    }
+
+    public static Formatting getProgressColor(float progress) {
         if (progress == 0f) {
-            TeamUtility.updateTempTeamColor(player, Formatting.GRAY);
+            return Formatting.GRAY;
         } else if (progress > 0f && progress <= 0.25f) {
-            TeamUtility.updateTempTeamColor(player, Formatting.YELLOW);
+            return Formatting.YELLOW;
         } else if (progress > 0.25f && progress <= 0.5f) {
-            TeamUtility.updateTempTeamColor(player, Formatting.GOLD);
+            return Formatting.GOLD;
         } else if (progress > 0.5f && progress <= 0.75f) {
-            TeamUtility.updateTempTeamColor(player, Formatting.RED);
+            return Formatting.RED;
         } else if (progress > 0.75f && progress <= 0.99f) {
-            TeamUtility.updateTempTeamColor(player, Formatting.DARK_RED);
-        } else if (progress == 1f) {
-            TeamUtility.updateTempTeamColor(player, Formatting.GRAY);
+            return Formatting.DARK_RED;
+        } else {
+            return Formatting.GRAY;
         }
     }
 

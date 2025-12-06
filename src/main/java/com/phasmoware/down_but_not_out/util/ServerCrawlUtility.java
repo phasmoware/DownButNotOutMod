@@ -31,6 +31,7 @@ public class ServerCrawlUtility {
         if (ModConfig.INSTANCE.SHOW_REVIVE_TAG_ABOVE_PLAYER) {
             armorStand.setCustomNameVisible(true);
             armorStand.setCustomName(Text.literal(Constants.CUSTOM_REVIVE_TAG_ABOVE_NAME));
+
         } else {
             armorStand.setCustomNameVisible(false);
         }

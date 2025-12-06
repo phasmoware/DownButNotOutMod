@@ -81,6 +81,9 @@ public class ReviveTimer {
     }
 
     public int getCurrentProgressPercent() {
+        if (ModConfig.INSTANCE.REVIVE_DURATION_TICKS <= 1) {
+            return 100;
+        }
         return (int) ((((float) this.reviveProgressTicks / (float) ModConfig.INSTANCE.REVIVE_DURATION_TICKS)) * 100);
     }
 }
