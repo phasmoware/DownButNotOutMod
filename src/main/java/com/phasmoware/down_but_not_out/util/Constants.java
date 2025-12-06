@@ -22,6 +22,7 @@ public class Constants {
     public static final String PLAYER_IS_NULL_ON_REMOVE_DOWNED_STATE_ERROR = "Error: Can't change downed state because player is null!";
     public static final Text REVIVE_CANCELED_TEXT = Text.literal("Revive canceled!").formatted(Formatting.RED);
     public static final Text USE_EMPTY_HAND_TO_REVIVE_TEXT = Text.literal("Use a free hand to revive them!").formatted(Formatting.RED);
+    public static final Text REVIVER_NOT_TEAMMATE_TEXT = Text.literal("Wrong team!").formatted(Formatting.RED);
     public static final Text TOO_FAR_AWAY_TO_REVIVE_TEXT = Text.literal("Too far away to revive them!").formatted(Formatting.RED);
     public static final float HEARTS_WHILE_DOWNED = 0.000001f;
     public static final float BASE_MOVE_SPEED = 0.1f;

@@ -75,4 +75,9 @@ public class MessageHandler {
         MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, reviver);
         MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
     }
+
+    public static void onPlayerRevivingFromDifferentTeam(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
+        MessageHandler.sendUpdateMessage(Constants.REVIVER_NOT_TEAMMATE_TEXT, reviver);
+        MessageHandler.sendUpdateMessage(Constants.REVIVER_NOT_TEAMMATE_TEXT, downed);
+    }
 }
