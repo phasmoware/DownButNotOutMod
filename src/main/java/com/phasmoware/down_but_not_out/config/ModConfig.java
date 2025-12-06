@@ -11,6 +11,7 @@ public final class ModConfig {
     public boolean USE_OVERLAY_MESSAGES = true;
     public boolean DOWNED_PLAYERS_HAVE_GLOW_EFFECT = true;
     public boolean DOWNED_PLAYERS_HAVE_BLINDNESS_EFFECT = true;
+    public boolean RESTRICT_REVIVE_TO_TEAMMATES_OR_TEAMLESS = false;
     public boolean USE_CUSTOM_DOWNED_TEAMS = true;
     public boolean ALLOW_CHANGE_GAME_MODE = true;
     public boolean SHOW_REVIVE_TAG_ABOVE_PLAYER = true;

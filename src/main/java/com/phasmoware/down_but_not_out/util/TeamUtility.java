@@ -28,27 +28,36 @@ public class TeamUtility {
         return Text.literal(Constants.MOD_ABBREV_PREFIX).append(player.getName());
     }
 
+    public static Team getTempDownedTeam(ServerPlayerEntity player) {
+        String teamName = getTempDownedTeamName(player);
+        Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
+        return scoreboard.getTeam(teamName);
+    }
+
+    public static Team addTempTeamToScoreboard(ServerPlayerEntity player) {
+        Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
+        String teamName = getTempDownedTeamName(player);
+        Text teamDisplayName = getTempDownedTeamDisplayName(player);
+        Team team = scoreboard.addTeam(teamName);
+        team.setDisplayName(teamDisplayName);
+        team.setFriendlyFireAllowed(true);
+        team.setShowFriendlyInvisibles(false);
+        team.setCollisionRule(AbstractTeam.CollisionRule.PUSH_OWN_TEAM);
+        team.setColor(Formatting.DARK_RED);
+        return team;
+    }
+
     public static void assignTempDownedTeam(ServerPlayerEntity player) {
         // player can only be on one team so we should not overwrite a current team
         // only applies if player is not part of a different team already
+        Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
+        String teamName = getTempDownedTeamName(player);
+        Team team = scoreboard.getTeam(teamName);
         if (player.getScoreboardTeam() == null) {
-            Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
-            String teamName = getTempDownedTeamName(player);
-            Text teamDisplayName = getTempDownedTeamDisplayName(player);
-
-            if (scoreboard.getTeam(teamName) == null) {
-                Team team = scoreboard.addTeam(teamName);
-                team.setDisplayName(teamDisplayName);
-                team.setFriendlyFireAllowed(true);
-                team.setShowFriendlyInvisibles(false);
-                team.setCollisionRule(AbstractTeam.CollisionRule.PUSH_OWN_TEAM);
-                team.setColor(Formatting.DARK_RED);
+            if (team == null) {
+                team = addTempTeamToScoreboard(player);
             }
-
-            Team team = scoreboard.getTeam(teamName);
-            if (team != null) {
-                scoreboard.addScoreHolderToTeam(player.getNameForScoreboard(), team);
-            }
+            scoreboard.addScoreHolderToTeam(player.getNameForScoreboard(), team);
         }
     }
 
@@ -61,8 +70,8 @@ public class TeamUtility {
     }
 
     public static void updateTempTeamColor(ServerPlayerEntity player, Formatting color) {
-        if (isOnTempDownedTeam(player)) {
-            Team team = player.getScoreboardTeam();
+        if (getTempDownedTeam(player) != null) {
+            Team team = getTempDownedTeam(player);
             if (team != null && !(team.getColor().equals(color))) {
                 team.setColor(color);
             }
@@ -98,7 +107,10 @@ public class TeamUtility {
         ShulkerEntity shulker = serverPlayer.dbno$getInvisibleShulkerEntity();
         ArmorStandEntity armorStandEntity = serverPlayer.dbno$getInvisibleArmorStandEntity();
         Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
-        Team team = player.getScoreboardTeam();
+        Team team = getTempDownedTeam(player);
+        if (team == null) {
+            team = addTempTeamToScoreboard(player);
+        }
         scoreboard.addScoreHolderToTeam(shulker.getNameForScoreboard(), team);
         scoreboard.addScoreHolderToTeam(armorStandEntity.getNameForScoreboard(), team);
     }
