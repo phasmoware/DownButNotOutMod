@@ -3,7 +3,7 @@
   "id": "down_but_not_out",
   "version": "${version}",
   "name": "Down But Not Out",
-  "description": "Revive your downed friends with this fully server side mod that works with vanilla clients and Geyser Bedrock clients",
+  "description": "Revive downed players: instead of dying, players drop to half a heart and crawl. Inspired by Call of Duty Zombies. Fully server-side and compatible with vanilla and Geyser Bedrock clients.",
   "authors": ["phasmoware"],
   "contact": {},
   "license": "GPL-3.0",

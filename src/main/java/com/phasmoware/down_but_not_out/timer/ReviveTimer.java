@@ -2,7 +2,8 @@ package com.phasmoware.down_but_not_out.timer;
 
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.handler.MessageHandler;
-import com.phasmoware.down_but_not_out.manager.DownedStateManager;
+import com.phasmoware.down_but_not_out.StateManager;
+import com.phasmoware.down_but_not_out.util.ReviveUtility;
 import com.phasmoware.down_but_not_out.util.TeamUtility;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -25,14 +26,14 @@ public class ReviveTimer {
 
 
     public void tick() {
-        if (DownedStateManager.checkValidReviver(reviver, downed)) {
+        if (ReviveUtility.checkValidReviver(reviver, downed)) {
             TeamUtility.updateRevivingTeamColor(downed);
             interactionActive = true;
             reviveProgressTicks++;
             updateReviveProgress();
             if (this.reviveProgressTicks >= ModConfig.INSTANCE.REVIVE_DURATION_TICKS) {
                 reviveProgressTicks = 0;
-                DownedStateManager.onReviveComplete(downed, reviver);
+                StateManager.onReviveComplete(downed, reviver);
                 stopReviveInteraction();
             }
         } else if (interactionActive || reviver != null) {
@@ -80,6 +81,9 @@ public class ReviveTimer {
     }
 
     public int getCurrentProgressPercent() {
+        if (ModConfig.INSTANCE.REVIVE_DURATION_TICKS <= 1) {
+            return 100;
+        }
         return (int) ((((float) this.reviveProgressTicks / (float) ModConfig.INSTANCE.REVIVE_DURATION_TICKS)) * 100);
     }
 }

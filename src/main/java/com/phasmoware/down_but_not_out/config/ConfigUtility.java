@@ -17,6 +17,9 @@ public final class ConfigUtility {
     private static final String CONF_FILE = "config.json";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path GLOBAL_CONF_PATH = FabricLoader.getInstance().getConfigDir();
+    public static final String SYNTAX_ERROR_MSG = "Error: Config file has syntax errors! Please make sure it is valid json or delete it to revert to defaults!";
+    public static final String FILE_REQUEST_FAILED_MSG = "Error: Config file request failed! Please check config filepath permissions!";
+    public static final String SAVE_CONFIG_FAILED_MSG = "Error: Writing to config file failed! Please check permissions!";
 
     private static File requestConfigFile() throws IOException {
         Path directoryPath = GLOBAL_CONF_PATH.resolve(CONF_DIR);
@@ -25,7 +28,7 @@ public final class ConfigUtility {
         File file = directoryPath.resolve(CONF_FILE).toFile();
         if (!file.exists()) {
             Files.createFile(filePath);
-            saveConfig(filePath, new DefaultModConfig());
+            saveConfig(filePath, new ModConfig());
             file = directoryPath.resolve(CONF_FILE).toFile();
         }
         return file;
@@ -36,19 +39,19 @@ public final class ConfigUtility {
             File file = requestConfigFile();
             return GSON.fromJson(Files.readString(file.toPath()), ModConfig.class);
         } catch (JsonSyntaxException je) {
-            Constants.LOGGER.error("Error: Config file has syntax errors! Please make sure it is valid json or delete it to revert to defaults!", je);
+            Constants.LOGGER.error(SYNTAX_ERROR_MSG, je);
             throw new RuntimeException(je);
         } catch (IOException e) {
-            Constants.LOGGER.error("Error: Config file request failed! Please check config filepath permissions!", e);
+            Constants.LOGGER.error(FILE_REQUEST_FAILED_MSG, e);
             throw new RuntimeException(e);
         }
     }
 
-    private static void saveConfig(Path filePath, DefaultModConfig config) {
+    private static void saveConfig(Path filePath, ModConfig config) {
         try {
             Files.writeString(filePath, GSON.toJson(config));
         } catch (IOException e) {
-            Constants.LOGGER.error("Error: Writing to config file failed! Please check permissions!", e);
+            Constants.LOGGER.error(SAVE_CONFIG_FAILED_MSG, e);
             throw new RuntimeException(e);
         }
     }

@@ -1,6 +1,6 @@
 package com.phasmoware.down_but_not_out.util;
 
-import com.phasmoware.down_but_not_out.api.ServerPlayerAPI;
+import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.scoreboard.AbstractTeam;
@@ -20,14 +20,6 @@ public class TeamUtility {
         return team.getName().equals(getTempDownedTeamName(player));
     }
 
-    public static boolean isOnATeamAlready(ServerPlayerEntity player) {
-        Team team = player.getScoreboardTeam();
-        if (team == null) {
-            return false;
-        }
-        return !team.getName().equals(getTempDownedTeamName(player));
-    }
-
     public static String getTempDownedTeamName(ServerPlayerEntity player) {
         return Constants.MOD_ABBREV_PREFIX + player.getUuidAsString();
     }
@@ -37,6 +29,8 @@ public class TeamUtility {
     }
 
     public static void assignTempDownedTeam(ServerPlayerEntity player) {
+        // player can only be on one team so we should not overwrite a current team
+        // only applies if player is not part of a different team already
         if (player.getScoreboardTeam() == null) {
             Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
             String teamName = getTempDownedTeamName(player);
@@ -80,28 +74,32 @@ public class TeamUtility {
     }
 
     public static void updateBleedOutStatusTeamColor(ServerPlayerEntity player, float progress) {
+        updateTempTeamColor(player, getProgressColor(progress));
+    }
+
+    public static Formatting getProgressColor(float progress) {
         if (progress == 0f) {
-            TeamUtility.updateTempTeamColor(player, Formatting.GRAY);
+            return Formatting.GRAY;
         } else if (progress > 0f && progress <= 0.25f) {
-            TeamUtility.updateTempTeamColor(player, Formatting.YELLOW);
+            return Formatting.YELLOW;
         } else if (progress > 0.25f && progress <= 0.5f) {
-            TeamUtility.updateTempTeamColor(player, Formatting.GOLD);
+            return Formatting.GOLD;
         } else if (progress > 0.5f && progress <= 0.75f) {
-            TeamUtility.updateTempTeamColor(player, Formatting.RED);
+            return Formatting.RED;
         } else if (progress > 0.75f && progress <= 0.99f) {
-            TeamUtility.updateTempTeamColor(player, Formatting.DARK_RED);
-        } else if (progress == 1f) {
-            TeamUtility.updateTempTeamColor(player, Formatting.GRAY);
+            return Formatting.DARK_RED;
+        } else {
+            return Formatting.GRAY;
         }
     }
 
     public static void assignShulkerAndArmorStandToTempDownedTeam(ServerPlayerEntity player) {
-        ServerPlayerAPI serverPlayer = (ServerPlayerAPI) player;
-        ShulkerEntity shulker = serverPlayer.downButNotOut$getInvisibleShulkerEntity();
-        ArmorStandEntity armorstand = serverPlayer.downButNotOut$getInvisibleArmorStandEntity();
+        ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
+        ShulkerEntity shulker = serverPlayer.dbno$getInvisibleShulkerEntity();
+        ArmorStandEntity armorStandEntity = serverPlayer.dbno$getInvisibleArmorStandEntity();
         Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
         Team team = player.getScoreboardTeam();
         scoreboard.addScoreHolderToTeam(shulker.getNameForScoreboard(), team);
-        scoreboard.addScoreHolderToTeam(armorstand.getNameForScoreboard(), team);
+        scoreboard.addScoreHolderToTeam(armorStandEntity.getNameForScoreboard(), team);
     }
 }
