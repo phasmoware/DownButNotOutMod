@@ -73,6 +73,9 @@ public class DownedUtility {
                 StatusEffectInstance darkness = new StatusEffectInstance(StatusEffects.DARKNESS, -1, 0, false, false);
                 player.addStatusEffect(darkness);
             }
+            if (player.getVehicle() != null) {
+                player.stopRiding();
+            }
             EntityAttributeInstance moveSpeed = player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
             moveSpeed.setBaseValue(ModConfig.INSTANCE.DOWNED_MOVE_SPEED);
         } else {
