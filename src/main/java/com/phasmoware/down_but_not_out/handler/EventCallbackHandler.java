@@ -1,8 +1,11 @@
 package com.phasmoware.down_but_not_out.handler;
 
+import com.phasmoware.down_but_not_out.data.PlayerData;
 import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.StateManager;
+import com.phasmoware.down_but_not_out.registry.ModAttachments;
+import com.phasmoware.down_but_not_out.util.DownedUtility;
 import com.phasmoware.down_but_not_out.util.ReviveUtility;
 import com.phasmoware.down_but_not_out.util.ServerCrawlUtility;
 import com.phasmoware.down_but_not_out.util.TeamUtility;
@@ -67,10 +70,22 @@ public class EventCallbackHandler {
         TeamUtility.removeTempDownedTeam((ServerPlayerEntity) playerEntity);
     }
 
+    public static void onPlayerDisconnect(PlayerEntity playerEntity) {
+        ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) playerEntity;
+        PlayerData playerData = serverPlayerEntity.getAttached(ModAttachments.PLAYER_DATA);
+        if (playerData != null && isDowned(playerEntity)) {
+            ServerPlayerDuck serverPlayerDuck = (ServerPlayerDuck) serverPlayerEntity;
+            DownedUtility.savePlayerData(serverPlayerEntity, true, serverPlayerDuck.dbno$getBleedOutTimer().getTicksUntilBleedOut());
+        }
+        onCleanUpEvent(playerEntity);
+    }
+
     public static void onPlayerJoinWhileDowned(ServerPlayerEntity serverPlayer) {
         if (isDowned(serverPlayer)) {
+            ServerPlayerDuck serverPlayerDuck = (ServerPlayerDuck) serverPlayer;
             StateManager.onPlayerDownedEvent(serverPlayer, null);
-            ReviveUtility.applyRevivedPenalty((ServerPlayerDuck) serverPlayer);
+            serverPlayerDuck.dbno$getBleedOutTimer().setTicksUntilBleedOut(DownedUtility.getPlayerData(serverPlayer).ticksUntilBleedOut());
+            ReviveUtility.applyRevivedPenalty(serverPlayerDuck);
         }
     }
 }

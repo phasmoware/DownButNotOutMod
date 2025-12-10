@@ -4,7 +4,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import com.phasmoware.down_but_not_out.handler.MessageHandler;
-import com.phasmoware.down_but_not_out.util.Constants;
+import com.phasmoware.down_but_not_out.util.DownedUtility;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -23,7 +23,7 @@ public class BleedOutCommand implements Command<ServerCommandSource> {
             MessageHandler.sendErrorMessage(Text.literal(MUST_BE_A_PLAYER_TO_USE_THIS_COMMAND), source);
             return 1;
         }
-        if (!(player.getCommandTags().contains(Constants.DOWNED_TAG))) {
+        if (!(DownedUtility.isDowned(player))) {
             MessageHandler.sendErrorMessage(Text.literal(NOT_IN_A_DOWNED_STATE), source);
             return 1;
         }

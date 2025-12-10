@@ -51,7 +51,7 @@ public class ModEvents {
     }
 
     private static void registerServerPlayerDisconnectEvent() {
-        ServerPlayerEvents.LEAVE.register(EventCallbackHandler::onCleanUpEvent);
+        ServerPlayerEvents.LEAVE.register(EventCallbackHandler::onPlayerDisconnect);
     }
 
     private static void registerServerPlayerJoinEvent() {
