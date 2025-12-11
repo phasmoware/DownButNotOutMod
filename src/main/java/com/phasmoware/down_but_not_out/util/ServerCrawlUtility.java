@@ -25,9 +25,6 @@ public class ServerCrawlUtility {
         armorStand.setInvulnerable(true);
         armorStand.setSilent(true);
         armorStand.setPosition(player.getEntityPos());
-
-        ((ArmorStandEntityAccessor) armorStand).invokeSetMarker(true);
-        ((ArmorStandEntityAccessor) armorStand).invokeSetSmall(true);
         if (ModConfig.INSTANCE.SHOW_REVIVE_TAG_ABOVE_PLAYER) {
             armorStand.setCustomNameVisible(true);
             armorStand.setCustomName(Text.literal(Constants.CUSTOM_REVIVE_TAG_ABOVE_NAME));
@@ -36,7 +33,12 @@ public class ServerCrawlUtility {
             armorStand.setCustomNameVisible(false);
         }
         EntityAttributeInstance armorStandScale = armorStand.getAttributeInstance(EntityAttributes.SCALE);
-        armorStandScale.setBaseValue(Constants.MIN_ENTITY_SCALE);
+        if (armorStandScale != null) {
+            armorStandScale.setBaseValue(Constants.MIN_ENTITY_SCALE);
+        }
+        ArmorStandEntityAccessor accessor = (ArmorStandEntityAccessor) armorStand;
+        accessor.invokeSetMarker(true);
+        accessor.invokeSetSmall(true);
         player.getEntityWorld().spawnEntity(armorStand);
         return armorStand;
     }
@@ -51,8 +53,9 @@ public class ServerCrawlUtility {
         shulkerEntity.setCustomNameVisible(false);
 
         EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
-        attributeInstance.setBaseValue(Constants.MIN_ENTITY_SCALE);
-
+        if (attributeInstance != null) {
+            attributeInstance.setBaseValue(Constants.MIN_ENTITY_SCALE);
+        }
         shulkerEntity.setInvisible(true);
         StatusEffectInstance instance = new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false);
         shulkerEntity.addStatusEffect(instance);
@@ -83,8 +86,8 @@ public class ServerCrawlUtility {
 
     public static void forceCrawlPose(ServerPlayerDuck serverPlayer) {
         ServerPlayerEntity player = (ServerPlayerEntity) serverPlayer;
-        Vec3d headPosition = new Vec3d(player.getX(), player.getY(), player.getZ()).offset(Direction.UP, Constants.Y_OFFSET);
-        if (serverPlayer.dbno$getInvisibleShulkerEntity().getEntityPos().squaredDistanceTo(headPosition) > 0.1) {
+        Vec3d headPosition = player.getEntityPos().offset(Direction.UP, Constants.Y_OFFSET);
+        if (serverPlayer.dbno$getInvisibleShulkerEntity().getEntityPos().squaredDistanceTo(headPosition) > 0.01) {
             if (serverPlayer.dbno$getInvisibleArmorStandEntity() != null && !serverPlayer.dbno$getInvisibleArmorStandEntity().isRemoved()) {
                 serverPlayer.dbno$getInvisibleArmorStandEntity().setPosition(headPosition.x, headPosition.y, headPosition.z);
             } else if (serverPlayer.dbno$getInvisibleShulkerEntity() == null || serverPlayer.dbno$getInvisibleShulkerEntity().isRemoved()) {

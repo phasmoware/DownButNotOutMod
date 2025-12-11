@@ -30,7 +30,7 @@ public class Constants {
     public static final float REVIVED_SOUND_PITCH = 0.6f;
     public static final float MIN_TICK_PROGRESS = 1.0f;
     public static final double MIN_ENTITY_SCALE = 0.0625d;
-    public static final double Y_OFFSET = 0.95;
+    public static final double Y_OFFSET = 0.86;
     public static final long UPDATE_MSG_SPAM_COOLDOWN = 15;
     public static final long REPEAT_MSG_SPAM_COOLDOWN = 60;
     public static final int MIN_HEARTBEAT_INTERVAL = 10;

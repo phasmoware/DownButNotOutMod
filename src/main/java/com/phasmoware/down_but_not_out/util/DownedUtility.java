@@ -111,7 +111,9 @@ public class DownedUtility {
                 player.stopRiding();
             }
             EntityAttributeInstance moveSpeed = player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
-            moveSpeed.setBaseValue(ModConfig.INSTANCE.DOWNED_MOVE_SPEED);
+            if (moveSpeed != null) {
+                moveSpeed.setBaseValue(ModConfig.INSTANCE.DOWNED_MOVE_SPEED);
+            }
         } else {
             Constants.LOGGER.error(Constants.PLAYER_IS_NULL_ON_APPLY_DOWNED_STATE_ERROR);
         }
@@ -127,7 +129,9 @@ public class DownedUtility {
             }
             player.setGlowing(false);
             EntityAttributeInstance moveSpeed = player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
-            moveSpeed.setBaseValue(Constants.BASE_MOVE_SPEED);
+            if (moveSpeed != null) {
+                moveSpeed.setBaseValue(Constants.BASE_MOVE_SPEED);
+            }
             player.removeStatusEffect(StatusEffects.DARKNESS);
             player.removeStatusEffect(StatusEffects.SLOWNESS);
             TeamUtility.removeTempDownedTeam(player);

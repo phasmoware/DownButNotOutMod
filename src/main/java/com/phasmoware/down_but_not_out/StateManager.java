@@ -23,14 +23,13 @@ public class StateManager {
     }
 
     public static void onPlayerDownedEvent(ServerPlayerEntity player, DamageSource damageSource) {
+        ServerCrawlUtility.setInvisibleShulkerArmorStandRider((ServerPlayerDuck) player);
         DownedUtility.applyDownedState(player);
         SoundUtility.playDownedSound(player);
         ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
 
         // original damageSource will be used for the death if possible
         serverPlayer.dbno$getBleedOutTimer().setDamageSource(damageSource);
-
-        ServerCrawlUtility.setInvisibleShulkerArmorStandRider((ServerPlayerDuck) player);
 
         if (ModConfig.INSTANCE.USE_CUSTOM_DOWNED_TEAMS) {
             TeamUtility.assignTempDownedTeam(player);
