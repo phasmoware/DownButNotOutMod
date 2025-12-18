@@ -22,14 +22,19 @@ public class DownedUtility {
         // clear status effects to ensure that they are not invulnerable to the damage source type
         player.clearStatusEffects();
         if (damageSource != null) {
-            player.damage(player.getEntityWorld(), damageSource, 0.1f); // should not survive
+            // player.damage(player.getEntityWorld(), damageSource, 0.1f); // should not survive
+            player.damage(damageSource, 0.1f);
         } else {
             // if damage source is null (because player logged out or because server restarted) try setting wither DamageSource
-            player.damage(player.getEntityWorld(), player.getEntityWorld().getDamageSources().wither(), 0.1f);
+            // player.damage(player.getEntityWorld(), player.getEntityWorld().getDamageSources().wither(), 0.1f);
+            player.damage(player.getEntityWorld().getDamageSources().wither(), 0.1f);
+
         }
         if (!player.isDead()) {
             // if player somehow survived with temporary health or something, fall back to kill command
-            player.kill(player.getEntityWorld());
+            // player.kill(player.getEntityWorld());
+            player.kill();
+
         }
     }
 
@@ -110,7 +115,9 @@ public class DownedUtility {
             if (player.getVehicle() != null) {
                 player.stopRiding();
             }
-            EntityAttributeInstance moveSpeed = player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
+            //EntityAttributeInstance moveSpeed = player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
+            EntityAttributeInstance moveSpeed = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+
             if (moveSpeed != null) {
                 moveSpeed.setBaseValue(ModConfig.INSTANCE.DOWNED_MOVE_SPEED);
             }
@@ -121,14 +128,18 @@ public class DownedUtility {
 
     public static void removeDownedState(ServerPlayerEntity player) {
         if (player != null) {
-            player.removeCommandTag(Constants.DOWNED_TAG);
+            //player.removeCommandTag(Constants.DOWNED_TAG);
+            player.removeScoreboardTag(Constants.DOWNED_TAG);
+
             savePlayerData(player, false, ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS);
             player.setInvulnerable(false);
             if (ModConfig.INSTANCE.ALLOW_CHANGE_GAME_MODE) {
                 player.changeGameMode(GameMode.SURVIVAL);
             }
             player.setGlowing(false);
-            EntityAttributeInstance moveSpeed = player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
+            //EntityAttributeInstance moveSpeed = player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
+            EntityAttributeInstance moveSpeed = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+
             if (moveSpeed != null) {
                 moveSpeed.setBaseValue(Constants.BASE_MOVE_SPEED);
             }

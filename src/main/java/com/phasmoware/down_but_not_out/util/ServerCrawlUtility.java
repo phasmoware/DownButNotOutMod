@@ -7,12 +7,17 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.ShulkerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.DyeColor;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
@@ -24,7 +29,8 @@ public class ServerCrawlUtility {
         armorStand.setNoGravity(true);
         armorStand.setInvulnerable(true);
         armorStand.setSilent(true);
-        armorStand.setPosition(player.getEntityPos());
+        //armorStand.setPosition(player.getEntityPos());
+        armorStand.setPosition(player.getPos());
         if (ModConfig.INSTANCE.SHOW_REVIVE_TAG_ABOVE_PLAYER) {
             armorStand.setCustomNameVisible(true);
             armorStand.setCustomName(Text.literal(Constants.CUSTOM_REVIVE_TAG_ABOVE_NAME));
@@ -32,10 +38,11 @@ public class ServerCrawlUtility {
         } else {
             armorStand.setCustomNameVisible(false);
         }
-        EntityAttributeInstance armorStandScale = armorStand.getAttributeInstance(EntityAttributes.SCALE);
+        /*EntityAttributeInstance armorStandScale = armorStand.getAttributeInstance(EntityAttributes.SCALE);
         if (armorStandScale != null) {
             armorStandScale.setBaseValue(Constants.MIN_ENTITY_SCALE);
-        }
+        }*/
+
         ArmorStandEntityAccessor accessor = (ArmorStandEntityAccessor) armorStand;
         accessor.invokeSetMarker(true);
         accessor.invokeSetSmall(true);
@@ -45,17 +52,21 @@ public class ServerCrawlUtility {
 
     public static ShulkerEntity spawnInvisibleShulker(ServerPlayerEntity player) {
         ShulkerEntity shulkerEntity = new ShulkerEntity(EntityType.SHULKER, player.getEntityWorld());
-        shulkerEntity.setPosition(player.getEntityPos());
+        //shulkerEntity.setPosition(player.getEntityPos());
+        NbtCompound nbt = new NbtCompound();
+        nbt.putInt("Color", DyeColor.WHITE.getId());
+        shulkerEntity.readNbt(nbt);
+        shulkerEntity.setPosition(player.getPos());
         shulkerEntity.setInvulnerable(true);
         shulkerEntity.setNoGravity(true);
         shulkerEntity.setAiDisabled(true);
         shulkerEntity.setSilent(true);
         shulkerEntity.setCustomNameVisible(false);
-
-        EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
+        shulkerEntity.setBaby(true);
+        /*EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
         if (attributeInstance != null) {
             attributeInstance.setBaseValue(Constants.MIN_ENTITY_SCALE);
-        }
+        }*/
         shulkerEntity.setInvisible(true);
         StatusEffectInstance instance = new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false);
         shulkerEntity.addStatusEffect(instance);
@@ -70,7 +81,8 @@ public class ServerCrawlUtility {
         // spawns and saves ArmorStand (vehicle)
         player.dbno$setInvisibleArmorStandEntity(spawnInvisibleArmorStand((ServerPlayerEntity) player));
         // spawn and mount Shulker on top of ArmorStand
-        player.dbno$getInvisibleShulkerEntity().startRiding(player.dbno$getInvisibleArmorStandEntity(), true, true);
+        //player.dbno$getInvisibleShulkerEntity().startRiding(player.dbno$getInvisibleArmorStandEntity(), true, true);
+        player.dbno$getInvisibleShulkerEntity().startRiding(player.dbno$getInvisibleArmorStandEntity(), true);
     }
 
     public static void cleanUpForceCrawlEntities(ServerPlayerDuck player) {
@@ -86,8 +98,11 @@ public class ServerCrawlUtility {
 
     public static void forceCrawlPose(ServerPlayerDuck serverPlayer) {
         ServerPlayerEntity player = (ServerPlayerEntity) serverPlayer;
-        Vec3d headPosition = player.getEntityPos().offset(Direction.UP, Constants.Y_OFFSET);
-        if (serverPlayer.dbno$getInvisibleShulkerEntity().getEntityPos().squaredDistanceTo(headPosition) > 0.01) {
+        //Vec3d headPosition = player.getEntityPos().offset(Direction.UP, Constants.Y_OFFSET);
+        Vec3d headPosition = player.getPos().offset(Direction.UP, Constants.Y_OFFSET);
+
+        //if (serverPlayer.dbno$getInvisibleShulkerEntity().getEntityPos().squaredDistanceTo(headPosition) > 0.01) {
+        if (serverPlayer.dbno$getInvisibleShulkerEntity() != null && serverPlayer.dbno$getInvisibleShulkerEntity().getPos().squaredDistanceTo(headPosition) > 0.01) {
             if (serverPlayer.dbno$getInvisibleArmorStandEntity() != null && !serverPlayer.dbno$getInvisibleArmorStandEntity().isRemoved()) {
                 serverPlayer.dbno$getInvisibleArmorStandEntity().setPosition(headPosition.x, headPosition.y, headPosition.z);
             } else if (serverPlayer.dbno$getInvisibleShulkerEntity() == null || serverPlayer.dbno$getInvisibleShulkerEntity().isRemoved()) {

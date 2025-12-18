@@ -36,8 +36,11 @@ public class StateManager {
             TeamUtility.assignShulkerAndArmorStandToTempDownedTeam(player);
         }
 
-        MessageHandler.broadcastMessageToPlayers(player.getName().getLiteralString() +
-                Constants.DOWNED_STATE_MSG, player.getEntityWorld(), Formatting.RED);
+        //MessageHandler.broadcastMessageToPlayers(player.getName().getLiteralString() +
+        //Constants.DOWNED_STATE_MSG, player.getEntityWorld(), Formatting.RED);
+        MessageHandler.broadcastMessageToPlayers(player.getName().getString() +
+                Constants.DOWNED_STATE_MSG, player.getServerWorld(), Formatting.RED);
+
 
         MessageHandler.sendClickableGiveUpMessage(player);
     }
@@ -53,8 +56,10 @@ public class StateManager {
     }
 
     public static void onReviveComplete(ServerPlayerEntity player, ServerPlayerEntity reviver) {
-        MessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() +
-                Constants.REVIVED_MSG + player.getName().getLiteralString(), player.getEntityWorld(), Formatting.GREEN);
+        /*MessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() +
+                Constants.REVIVED_MSG + player.getName().getLiteralString(), player.getEntityWorld(), Formatting.GREEN);*/
+        MessageHandler.broadcastMessageToPlayers(reviver.getName().getString() +
+                Constants.REVIVED_MSG + player.getName().getString(), player.getServerWorld(), Formatting.GREEN);
         ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
         ReviveUtility.applyRevivedPenalty(serverPlayer);
         SoundUtility.playRevivedSound(player);

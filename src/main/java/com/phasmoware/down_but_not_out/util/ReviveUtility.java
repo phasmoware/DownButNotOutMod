@@ -26,7 +26,9 @@ public class ReviveUtility {
         }
         Vec3d eyePos = viewer.getCameraPosVec(Constants.MIN_TICK_PROGRESS);
         Vec3d lookDir = viewer.getRotationVec(Constants.MIN_TICK_PROGRESS);
-        Vec3d rayEnd = eyePos.add(lookDir.multiply(viewer.getEntityInteractionRange()));
+        //Vec3d rayEnd = eyePos.add(lookDir.multiply(viewer.getEntityInteractionRange()));
+        Vec3d rayEnd = eyePos.add(lookDir.multiply(3.0)); // 3 blocks is attack range
+
         // expand by a bit for stability
         Box targetBox = target.getBoundingBox().expand(0.1);
         Optional<Vec3d> hit = targetBox.raycast(eyePos, rayEnd);
@@ -56,7 +58,10 @@ public class ReviveUtility {
             MessageHandler.onPlayerRevivingWithoutEmptyHand(reviver, downed);
             return false;
         }
-        if ((reviver.squaredDistanceTo(downed) > reviver.getBlockInteractionRange())) {
+        //if ((reviver.squaredDistanceTo(downed) > reviver.getBlockInteractionRange())) {
+        if ((reviver.squaredDistanceTo(downed) > 3.0)) {
+
+
             MessageHandler.onPlayerRevivingTooFarAway(reviver, downed);
             return false;
         }

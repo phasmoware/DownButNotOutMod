@@ -13,7 +13,9 @@ import net.minecraft.util.Formatting;
 public class TeamUtility {
 
     public static boolean isOnTempDownedTeam(ServerPlayerEntity player) {
-        Team team = player.getScoreboardTeam();
+        //Team team = player.getScoreboardTeam();
+        Team team = (Team) player.getScoreboardTeam();
+
         if (team == null) {
             return false;
         }
@@ -57,7 +59,8 @@ public class TeamUtility {
             if (team == null) {
                 team = addTempTeamToScoreboard(player);
             }
-            scoreboard.addScoreHolderToTeam(player.getNameForScoreboard(), team);
+            //scoreboard.addScoreHolderToTeam(player.getNameForScoreboard(), team);
+            scoreboard.addPlayerToTeam(player.getEntityName(), team);
         }
     }
 
@@ -111,7 +114,9 @@ public class TeamUtility {
         if (team == null) {
             team = addTempTeamToScoreboard(player);
         }
-        scoreboard.addScoreHolderToTeam(shulker.getNameForScoreboard(), team);
-        scoreboard.addScoreHolderToTeam(armorStandEntity.getNameForScoreboard(), team);
+        /*scoreboard.addScoreHolderToTeam(shulker.getNameForScoreboard(), team);
+        scoreboard.addScoreHolderToTeam(armorStandEntity.getNameForScoreboard(), team);*/
+        scoreboard.addPlayerToTeam(shulker.getEntityName(), team);
+        scoreboard.addPlayerToTeam(armorStandEntity.getEntityName(), team);
     }
 }

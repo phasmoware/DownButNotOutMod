@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.*;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
 
 public class ModEvents {
@@ -43,7 +44,7 @@ public class ModEvents {
 
         // prevent right click item interaction while downed
         UseItemCallback.EVENT.register((playerEntity, world, hand) ->
-                EventCallbackHandler.onConsumeDownedAction(playerEntity));
+                EventCallbackHandler.onConsumeDownedItemAction(playerEntity));
     }
 
     private static void registerReviveInteractionEvent() {
@@ -51,10 +52,12 @@ public class ModEvents {
     }
 
     private static void registerServerPlayerDisconnectEvent() {
-        ServerPlayerEvents.LEAVE.register(EventCallbackHandler::onPlayerDisconnect);
+        //ServerPlayerEvents.LEAVE.register(EventCallbackHandler::onPlayerDisconnect);
+        ServerPlayConnectionEvents.DISCONNECT.register(EventCallbackHandler::onPlayerDisconnect);
     }
 
     private static void registerServerPlayerJoinEvent() {
-        ServerPlayerEvents.JOIN.register(EventCallbackHandler::onPlayerJoinWhileDowned);
+        //ServerPlayerEvents.JOIN.register(EventCallbackHandler::onPlayerJoinWhileDowned);
+        ServerPlayConnectionEvents.JOIN.register(EventCallbackHandler::onPlayerJoinWhileDowned);
     }
 }

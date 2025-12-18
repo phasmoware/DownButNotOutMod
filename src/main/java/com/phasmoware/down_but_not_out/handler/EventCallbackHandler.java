@@ -9,13 +9,18 @@ import com.phasmoware.down_but_not_out.util.DownedUtility;
 import com.phasmoware.down_but_not_out.util.ReviveUtility;
 import com.phasmoware.down_but_not_out.util.ServerCrawlUtility;
 import com.phasmoware.down_but_not_out.util.TeamUtility;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
 
@@ -55,6 +60,13 @@ public class EventCallbackHandler {
         return ActionResult.PASS;
     }
 
+    public static TypedActionResult<ItemStack> onConsumeDownedItemAction(PlayerEntity playerEntity) {
+        if (isDowned(playerEntity)) {
+            return TypedActionResult.fail(playerEntity.getStackInHand(Hand.MAIN_HAND));
+        }
+        return TypedActionResult.pass(playerEntity.getStackInHand(Hand.MAIN_HAND));
+    }
+
     public static ActionResult onReviveDownedInteraction(PlayerEntity playerEntity, World world, Hand hand, Entity entity, EntityHitResult entityHitResult) {
         if (isDowned(playerEntity)) {
             return ActionResult.CONSUME;
@@ -70,7 +82,7 @@ public class EventCallbackHandler {
         TeamUtility.removeTempDownedTeam((ServerPlayerEntity) playerEntity);
     }
 
-    public static void onPlayerDisconnect(PlayerEntity playerEntity) {
+    /*public static void onPlayerDisconnect(PlayerEntity playerEntity) {
         ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) playerEntity;
         PlayerData playerData = serverPlayerEntity.getAttached(ModAttachments.PLAYER_DATA);
         if (playerData != null && isDowned(playerEntity)) {
@@ -81,6 +93,26 @@ public class EventCallbackHandler {
     }
 
     public static void onPlayerJoinWhileDowned(ServerPlayerEntity serverPlayer) {
+        if (isDowned(serverPlayer)) {
+            ServerPlayerDuck serverPlayerDuck = (ServerPlayerDuck) serverPlayer;
+            StateManager.onPlayerDownedEvent(serverPlayer, null);
+            serverPlayerDuck.dbno$getBleedOutTimer().setTicksUntilBleedOut(DownedUtility.getPlayerData(serverPlayer).ticksUntilBleedOut());
+            ReviveUtility.applyRevivedPenalty(serverPlayerDuck);
+        }
+    }*/
+
+    public static void onPlayerDisconnect(ServerPlayNetworkHandler serverPlayNetworkHandler, MinecraftServer minecraftServer) {
+        ServerPlayerEntity serverPlayerEntity = serverPlayNetworkHandler.getPlayer();
+        PlayerData playerData = serverPlayerEntity.getAttached(ModAttachments.PLAYER_DATA);
+        if (playerData != null && isDowned(serverPlayerEntity)) {
+            ServerPlayerDuck serverPlayerDuck = (ServerPlayerDuck) serverPlayerEntity;
+            DownedUtility.savePlayerData(serverPlayerEntity, true, serverPlayerDuck.dbno$getBleedOutTimer().getTicksUntilBleedOut());
+        }
+        onCleanUpEvent(serverPlayerEntity);
+    }
+
+    public static void onPlayerJoinWhileDowned(ServerPlayNetworkHandler serverPlayNetworkHandler, PacketSender packetSender, MinecraftServer minecraftServer) {
+        ServerPlayerEntity serverPlayer = serverPlayNetworkHandler.getPlayer();
         if (isDowned(serverPlayer)) {
             ServerPlayerDuck serverPlayerDuck = (ServerPlayerDuck) serverPlayer;
             StateManager.onPlayerDownedEvent(serverPlayer, null);

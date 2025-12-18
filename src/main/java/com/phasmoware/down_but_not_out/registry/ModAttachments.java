@@ -7,13 +7,21 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.util.Identifier;
 
 public class ModAttachments {
-    public static final AttachmentType<PlayerData> PLAYER_DATA = AttachmentRegistry.create(
-            Identifier.of(Constants.MOD_ID, "player_data"),
-            builder -> builder
+
+         /*public static final AttachmentType<PlayerData> PLAYER_DATA = AttachmentRegistry.create(
+             Identifier.of(Constants.MOD_ID, "player_data"),
+                builder -> builder
                     .initializer(PlayerData::new)
                     .persistent(PlayerData.CODEC)
                     .copyOnDeath()
-    );
+         );*/
 
-    public static void init() {}
+        public static final AttachmentType<PlayerData> PLAYER_DATA = AttachmentRegistry.<PlayerData>builder()
+                        .initializer(PlayerData::new)
+                        .persistent(PlayerData.CODEC)
+                        .copyOnDeath()
+                        .buildAndRegister(Identifier.of(Constants.MOD_ID, "player_data"));
+
+        public static void init() {
+        }
 }

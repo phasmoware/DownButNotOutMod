@@ -6,8 +6,8 @@
   "mixins": [
   ],
   "server": [
-    "ServerPlayerEntityMixin",
-    "ArmorStandEntityAccessor"
+    "ArmorStandEntityAccessor",
+    "ServerPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

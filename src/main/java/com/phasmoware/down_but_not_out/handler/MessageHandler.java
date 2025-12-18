@@ -22,8 +22,11 @@ public class MessageHandler {
                         .styled(style -> style
                                 .withColor(Formatting.RED)
                                 .withUnderline(true).withBold(true)
-                                .withClickEvent(new ClickEvent.RunCommand(Constants.COMMAND_STRING))
-                                .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run Command /" + Constants.COMMAND_STRING)))))
+                                //.withClickEvent(new ClickEvent.RunCommand(Constants.COMMAND_STRING))
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, Constants.COMMAND_STRING))
+                                //.withHoverEvent(new HoverEvent.ShowText(Text.literal("Run Command /" + Constants.COMMAND_STRING)))))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Run Command /" + Constants.COMMAND_STRING)))))
+
                 .append(Text.literal(" to give up and respawn")
                         .styled(style -> style
                                 .withBold(true).

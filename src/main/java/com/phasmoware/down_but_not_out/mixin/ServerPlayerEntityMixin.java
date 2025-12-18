@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,12 +39,16 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
     @Unique
     private Text lastUpdateText;
 
-    public ServerPlayerEntityMixin(World world, GameProfile profile) {
+    /*public ServerPlayerEntityMixin(World world, GameProfile profile) {
         super(world, profile);
+    }*/
+    public ServerPlayerEntityMixin(World world, BlockPos blockPos, float yaw, GameProfile gameProfile) {
+        super(world, blockPos, yaw, gameProfile);
     }
 
-    @Shadow
-    public abstract ServerWorld getEntityWorld();
+
+    //@Shadow
+    //public abstract ServerWorld getEntityWorld();
 
     @Inject(method = "tick()V", at = @At("TAIL"))
     private void injectTickPlayer(CallbackInfo ci) {
