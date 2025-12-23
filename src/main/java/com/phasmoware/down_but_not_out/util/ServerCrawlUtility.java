@@ -87,7 +87,7 @@ public class ServerCrawlUtility {
     public static void forceCrawlPose(ServerPlayerDuck serverPlayer) {
         ServerPlayerEntity player = (ServerPlayerEntity) serverPlayer;
         Vec3d headPosition = player.getEntityPos().offset(Direction.UP, Constants.Y_OFFSET);
-        if (serverPlayer.dbno$getInvisibleShulkerEntity().getEntityPos().squaredDistanceTo(headPosition) > 0.01) {
+        if (serverPlayer.dbno$getInvisibleShulkerEntity() != null && serverPlayer.dbno$getInvisibleShulkerEntity().getEntityPos().squaredDistanceTo(headPosition) > 0.01) {
             if (serverPlayer.dbno$getInvisibleArmorStandEntity() != null && !serverPlayer.dbno$getInvisibleArmorStandEntity().isRemoved()) {
                 serverPlayer.dbno$getInvisibleArmorStandEntity().setPosition(headPosition.x, headPosition.y, headPosition.z);
             } else if (serverPlayer.dbno$getInvisibleShulkerEntity() == null || serverPlayer.dbno$getInvisibleShulkerEntity().isRemoved()) {
