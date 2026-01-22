@@ -112,8 +112,10 @@ public class BleedOutTimer {
         if (ticksUntilBleedOut % 20 == 0) {
             ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
             if (ModConfig.INSTANCE.SHOW_REVIVE_TAG_ABOVE_PLAYER) {
-                serverPlayer.dbno$getInvisibleArmorStandEntity().setCustomName(Text.literal(Constants.CUSTOM_REVIVE_TAG_ABOVE_NAME + " " + (ticksUntilBleedOut / 20) + "s"));
-                serverPlayer.dbno$getInvisibleArmorStandEntity().setCustomNameVisible(true);
+                if (serverPlayer.dbno$getInvisibleArmorStandEntity() != null) {
+                    serverPlayer.dbno$getInvisibleArmorStandEntity().setCustomName(Text.literal(Constants.CUSTOM_REVIVE_TAG_ABOVE_NAME + " " + (ticksUntilBleedOut / 20) + "s"));
+                    serverPlayer.dbno$getInvisibleArmorStandEntity().setCustomNameVisible(true);
+                }
             }
             MessageHandler.sendThrottledUpdateMessage(Text.literal(BLEEDING_TIMER_MSG + (ticksUntilBleedOut / 20) + "s").formatted(TeamUtility.getProgressColor(getCurrentProgress())), player);
         }
