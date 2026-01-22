@@ -25,6 +25,7 @@ public class ServerCrawlUtility {
         armorStand.setInvulnerable(true);
         armorStand.setSilent(true);
         armorStand.setPosition(player.getEntityPos());
+        armorStand.addCommandTag(Constants.DOWNED_TAG);
         if (ModConfig.INSTANCE.SHOW_REVIVE_TAG_ABOVE_PLAYER) {
             armorStand.setCustomNameVisible(true);
             armorStand.setCustomName(Text.literal(Constants.CUSTOM_REVIVE_TAG_ABOVE_NAME));
@@ -51,6 +52,9 @@ public class ServerCrawlUtility {
         shulkerEntity.setAiDisabled(true);
         shulkerEntity.setSilent(true);
         shulkerEntity.setCustomNameVisible(false);
+        shulkerEntity.addCommandTag(Constants.DOWNED_TAG);
+        // for compatability with https://modrinth.com/datapack/random-mob-sizes-dp
+        shulkerEntity.addCommandTag(Constants.IGNORE_TAG);
 
         EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
         if (attributeInstance != null) {
@@ -92,6 +96,7 @@ public class ServerCrawlUtility {
                 serverPlayer.dbno$getInvisibleArmorStandEntity().setPosition(headPosition.x, headPosition.y, headPosition.z);
             } else if (serverPlayer.dbno$getInvisibleShulkerEntity() == null || serverPlayer.dbno$getInvisibleShulkerEntity().isRemoved()) {
                 setInvisibleShulkerArmorStandRider(serverPlayer);
+                TeamUtility.assignShulkerAndArmorStandToTempDownedTeam(player);
             }
         }
     }
