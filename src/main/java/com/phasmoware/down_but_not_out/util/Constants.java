@@ -10,7 +10,8 @@ public class Constants {
     public static final String MOD_INITIALIZED = MOD_ID + " mod initialized";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final String MOD_ABBREV_PREFIX = "dbno_";
-    public static final String DOWNED_TAG = "Downed";
+    public static final String DOWNED_TAG = "dbno.downed";
+    public static final String IGNORE_TAG = "global.ignore";
     public static final String SKIPPED_DOWNED_STATE_MSG = "No one was available to revive you...";
     public static final String LAVA_PREVENTED_DOWNED_MSG = "The lava prevented you from being downed...";
     public static final String DOWNED_STATE_MSG = " is down, give them a hand to revive them";
