@@ -111,7 +111,9 @@ public class TeamUtility {
         if (team == null) {
             team = addTempTeamToScoreboard(player);
         }
-        scoreboard.addScoreHolderToTeam(shulker.getNameForScoreboard(), team);
-        scoreboard.addScoreHolderToTeam(armorStandEntity.getNameForScoreboard(), team);
+        if (shulker != null && armorStandEntity != null) {
+            scoreboard.addScoreHolderToTeam(shulker.getNameForScoreboard(), team);
+            scoreboard.addScoreHolderToTeam(armorStandEntity.getNameForScoreboard(), team);
+        }
     }
 }

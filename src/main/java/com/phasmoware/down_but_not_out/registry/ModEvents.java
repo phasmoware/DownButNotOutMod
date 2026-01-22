@@ -1,6 +1,7 @@
 package com.phasmoware.down_but_not_out.registry;
 
 import com.phasmoware.down_but_not_out.handler.EventCallbackHandler;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -16,6 +17,7 @@ public class ModEvents {
         registerReviveInteractionEvent();
         registerServerPlayerDisconnectEvent();
         registerServerPlayerJoinEvent();
+        registerEntityChangeWorldEvent();
     }
 
     private static void registerServerCleanUpEvent() {
@@ -56,5 +58,9 @@ public class ModEvents {
 
     private static void registerServerPlayerJoinEvent() {
         ServerPlayerEvents.JOIN.register(EventCallbackHandler::onPlayerJoinWhileDowned);
+    }
+
+    private static void registerEntityChangeWorldEvent() {
+        ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register(EventCallbackHandler::onEntityChangeWorld);
     }
 }

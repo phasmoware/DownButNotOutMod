@@ -5,15 +5,15 @@ import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.StateManager;
 import com.phasmoware.down_but_not_out.registry.ModAttachments;
-import com.phasmoware.down_but_not_out.util.DownedUtility;
-import com.phasmoware.down_but_not_out.util.ReviveUtility;
-import com.phasmoware.down_but_not_out.util.ServerCrawlUtility;
-import com.phasmoware.down_but_not_out.util.TeamUtility;
+import com.phasmoware.down_but_not_out.util.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
@@ -86,6 +86,14 @@ public class EventCallbackHandler {
             StateManager.onPlayerDownedEvent(serverPlayer, null);
             serverPlayerDuck.dbno$getBleedOutTimer().setTicksUntilBleedOut(DownedUtility.getPlayerData(serverPlayer).ticksUntilBleedOut());
             ReviveUtility.applyRevivedPenalty(serverPlayerDuck);
+        }
+    }
+
+    public static void onEntityChangeWorld(Entity originalEntity, Entity newEntity, ServerWorld origin, ServerWorld destination) {
+        if (newEntity instanceof ShulkerEntity || newEntity instanceof ArmorStandEntity) {
+            if (newEntity.getCommandTags().contains(Constants.DOWNED_TAG)) {
+                newEntity.remove(Entity.RemovalReason.CHANGED_DIMENSION);
+            }
         }
     }
 }
