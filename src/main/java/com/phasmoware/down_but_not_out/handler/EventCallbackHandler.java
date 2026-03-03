@@ -12,6 +12,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
@@ -50,6 +51,16 @@ public class EventCallbackHandler {
 
     public static ActionResult onConsumeDownedAction(PlayerEntity playerEntity) {
         if (isDowned(playerEntity)) {
+            return ActionResult.FAIL;
+        }
+        return ActionResult.PASS;
+    }
+
+    public static ActionResult onConsumeDownedItemAction(PlayerEntity playerEntity, World world, Hand hand) {
+        if (isDowned(playerEntity) && playerEntity.isHolding(Items.TOTEM_OF_UNDYING)) {
+            StateManager.onBleedOutEvent((ServerPlayerEntity) playerEntity, null);
+            return ActionResult.FAIL;
+        } else if (isDowned(playerEntity)) {
             return ActionResult.FAIL;
         }
         return ActionResult.PASS;

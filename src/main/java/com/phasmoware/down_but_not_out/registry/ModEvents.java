@@ -43,9 +43,8 @@ public class ModEvents {
         AttackEntityCallback.EVENT.register((playerEntity, world, hand, entity, entityHitResult) ->
                 EventCallbackHandler.onConsumeDownedAction(playerEntity));
 
-        // prevent right click item interaction while downed
-        UseItemCallback.EVENT.register((playerEntity, world, hand) ->
-                EventCallbackHandler.onConsumeDownedAction(playerEntity));
+        // prevent right click item interaction while downed unless holding Totem Of Undying
+        UseItemCallback.EVENT.register(EventCallbackHandler::onConsumeDownedItemAction);
     }
 
     private static void registerReviveInteractionEvent() {
