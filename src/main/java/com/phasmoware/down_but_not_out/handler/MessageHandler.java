@@ -14,7 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 public class MessageHandler {
 
     public static void sendClickableGiveUpMessage(ServerPlayer player) {
-        player.displayClientMessage(Component.literal("Click or type ").withStyle(style -> style
+        player.sendSystemMessage(Component.literal("Click or type ").withStyle(style -> style
                 .withBold(true)
                 .withItalic(true)
                 .withColor(ChatFormatting.GRAY))
@@ -43,7 +43,7 @@ public class MessageHandler {
         ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
         if (!message.equals(serverPlayer.dbno$getLastUpdateText()) || serverPlayer.dbno$getTicksSinceLastUpdate() > Constants.REPEAT_MSG_SPAM_COOLDOWN) {
             serverPlayer.dbno$setLastUpdateText(message);
-            player.displayClientMessage(message, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+            player.sendSystemMessage(message, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
         }
     }
 

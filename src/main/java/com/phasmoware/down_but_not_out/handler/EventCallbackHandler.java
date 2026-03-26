@@ -102,7 +102,7 @@ public class EventCallbackHandler {
 
     public static void onEntityChangeWorld(Entity originalEntity, Entity newEntity, ServerLevel origin, ServerLevel destination) {
         if (newEntity instanceof Shulker || newEntity instanceof ArmorStand) {
-            if (newEntity.getTags().contains(Constants.DOWNED_TAG)) {
+            if (newEntity.entityTags().contains(Constants.DOWNED_TAG)) {
                 newEntity.remove(Entity.RemovalReason.CHANGED_DIMENSION);
             }
         }

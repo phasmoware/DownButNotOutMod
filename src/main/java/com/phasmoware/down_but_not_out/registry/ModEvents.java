@@ -1,7 +1,7 @@
 package com.phasmoware.down_but_not_out.registry;
 
 import com.phasmoware.down_but_not_out.handler.EventCallbackHandler;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -60,6 +60,6 @@ public class ModEvents {
     }
 
     private static void registerEntityChangeWorldEvent() {
-        ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register(EventCallbackHandler::onEntityChangeWorld);
+        ServerEntityLevelChangeEvents.AFTER_ENTITY_CHANGE_LEVEL.register(EventCallbackHandler::onEntityChangeWorld);
     }
 }
