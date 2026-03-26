@@ -1,7 +1,7 @@
 package com.phasmoware.down_but_not_out.util;
 
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +21,10 @@ public class Constants {
     public static final String COMMAND_STRING = "bleedout";
     public static final String PLAYER_IS_NULL_ON_APPLY_DOWNED_STATE_ERROR = "Error: Can't change downed state because player is null!";
     public static final String PLAYER_IS_NULL_ON_REMOVE_DOWNED_STATE_ERROR = "Error: Can't change downed state because player is null!";
-    public static final Text REVIVE_CANCELED_TEXT = Text.literal("Revive canceled!").formatted(Formatting.RED);
-    public static final Text USE_EMPTY_HAND_TO_REVIVE_TEXT = Text.literal("Use a free hand to revive them!").formatted(Formatting.RED);
-    public static final Text REVIVER_NOT_TEAMMATE_TEXT = Text.literal("Wrong team!").formatted(Formatting.RED);
-    public static final Text TOO_FAR_AWAY_TO_REVIVE_TEXT = Text.literal("Too far away to revive them!").formatted(Formatting.RED);
+    public static final Component REVIVE_CANCELED_TEXT = Component.literal("Revive canceled!").withStyle(ChatFormatting.RED);
+    public static final Component USE_EMPTY_HAND_TO_REVIVE_TEXT = Component.literal("Use a free hand to revive them!").withStyle(ChatFormatting.RED);
+    public static final Component REVIVER_NOT_TEAMMATE_TEXT = Component.literal("Wrong team!").withStyle(ChatFormatting.RED);
+    public static final Component TOO_FAR_AWAY_TO_REVIVE_TEXT = Component.literal("Too far away to revive them!").withStyle(ChatFormatting.RED);
     public static final float HEARTS_WHILE_DOWNED = 0.000001f;
     public static final float BASE_MOVE_SPEED = 0.1f;
     public static final float DOWNED_SOUND_PITCH = 1.2f;

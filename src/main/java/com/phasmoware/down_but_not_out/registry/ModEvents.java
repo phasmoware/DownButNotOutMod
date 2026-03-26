@@ -22,7 +22,7 @@ public class ModEvents {
 
     private static void registerServerCleanUpEvent() {
         ServerLifecycleEvents.SERVER_STOPPING.register(server ->
-                server.getPlayerManager().getPlayerList().forEach(EventCallbackHandler::onCleanUpEvent));
+                server.getPlayerList().getPlayers().forEach(EventCallbackHandler::onCleanUpEvent));
     }
 
     private static void registerAllowDeathEvent() {

@@ -7,9 +7,9 @@ import com.phasmoware.down_but_not_out.StateManager;
 import com.phasmoware.down_but_not_out.util.Constants;
 import com.phasmoware.down_but_not_out.util.SoundUtility;
 import com.phasmoware.down_but_not_out.util.TeamUtility;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,14 +20,14 @@ public class BleedOutTimer {
     public static final String BLEEDING_TIMER_MSG = "Bleeding Out in: ";
 
     @NotNull
-    private final ServerPlayerEntity player;
+    private final ServerPlayer player;
     private long ticksUntilBleedOut;
     @Nullable
     private DamageSource damageSource;
     private long reviveCooldownTicks;
     private long heartbeatCooldownTicks;
 
-    public BleedOutTimer(@NotNull ServerPlayerEntity player) {
+    public BleedOutTimer(@NotNull ServerPlayer player) {
         this.ticksUntilBleedOut = ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS;
         this.player = player;
     }
@@ -95,8 +95,8 @@ public class BleedOutTimer {
 
     private void updateDownedHealthAndHunger() {
         // set food level to 17 to stop constant healing and damage
-        if (player.getHungerManager().getFoodLevel() > Constants.NON_HEALING_FOOD_LEVEL) {
-            player.getHungerManager().setFoodLevel(Constants.NON_HEALING_FOOD_LEVEL);
+        if (player.getFoodData().getFoodLevel() > Constants.NON_HEALING_FOOD_LEVEL) {
+            player.getFoodData().setFoodLevel(Constants.NON_HEALING_FOOD_LEVEL);
         }
         if (player.getHealth() != Constants.HEARTS_WHILE_DOWNED) {
             player.setHealth(Constants.HEARTS_WHILE_DOWNED);
@@ -113,11 +113,11 @@ public class BleedOutTimer {
             ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
             if (ModConfig.INSTANCE.SHOW_REVIVE_TAG_ABOVE_PLAYER) {
                 if (serverPlayer.dbno$getInvisibleArmorStandEntity() != null) {
-                    serverPlayer.dbno$getInvisibleArmorStandEntity().setCustomName(Text.literal(Constants.CUSTOM_REVIVE_TAG_ABOVE_NAME + " " + (ticksUntilBleedOut / 20) + "s"));
+                    serverPlayer.dbno$getInvisibleArmorStandEntity().setCustomName(Component.literal(Constants.CUSTOM_REVIVE_TAG_ABOVE_NAME + " " + (ticksUntilBleedOut / 20) + "s"));
                     serverPlayer.dbno$getInvisibleArmorStandEntity().setCustomNameVisible(true);
                 }
             }
-            MessageHandler.sendThrottledUpdateMessage(Text.literal(BLEEDING_TIMER_MSG + (ticksUntilBleedOut / 20) + "s").formatted(TeamUtility.getProgressColor(getCurrentProgress())), player);
+            MessageHandler.sendThrottledUpdateMessage(Component.literal(BLEEDING_TIMER_MSG + (ticksUntilBleedOut / 20) + "s").withStyle(TeamUtility.getProgressColor(getCurrentProgress())), player);
         }
     }
 

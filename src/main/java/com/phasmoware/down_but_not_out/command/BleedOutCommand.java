@@ -5,30 +5,30 @@ import com.mojang.brigadier.context.CommandContext;
 import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import com.phasmoware.down_but_not_out.handler.MessageHandler;
 import com.phasmoware.down_but_not_out.util.DownedUtility;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 
-public class BleedOutCommand implements Command<ServerCommandSource> {
+public class BleedOutCommand implements Command<CommandSourceStack> {
 
     public static final String MUST_BE_A_PLAYER_TO_USE_THIS_COMMAND = "You must be a player to use this command.";
     public static final String NOT_IN_A_DOWNED_STATE = "You are not in a downed state.";
     public static final String BLEED_OUT_TIMER_NOT_SET = "Error: No BleedOut Timer has been set.";
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
-        ServerPlayerEntity player = source.getPlayer();
+    public int run(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        ServerPlayer player = source.getPlayer();
         if (player == null) {
-            MessageHandler.sendErrorMessage(Text.literal(MUST_BE_A_PLAYER_TO_USE_THIS_COMMAND), source);
+            MessageHandler.sendErrorMessage(Component.literal(MUST_BE_A_PLAYER_TO_USE_THIS_COMMAND), source);
             return 1;
         }
         if (!(DownedUtility.isDowned(player))) {
-            MessageHandler.sendErrorMessage(Text.literal(NOT_IN_A_DOWNED_STATE), source);
+            MessageHandler.sendErrorMessage(Component.literal(NOT_IN_A_DOWNED_STATE), source);
             return 1;
         }
         if (((ServerPlayerDuck) player).dbno$getBleedOutTimer() == null) {
-            MessageHandler.sendErrorMessage(Text.literal(BLEED_OUT_TIMER_NOT_SET), source);
+            MessageHandler.sendErrorMessage(Component.literal(BLEED_OUT_TIMER_NOT_SET), source);
             return 1;
         }
 

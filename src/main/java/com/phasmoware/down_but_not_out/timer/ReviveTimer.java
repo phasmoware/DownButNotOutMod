@@ -5,21 +5,21 @@ import com.phasmoware.down_but_not_out.handler.MessageHandler;
 import com.phasmoware.down_but_not_out.StateManager;
 import com.phasmoware.down_but_not_out.util.ReviveUtility;
 import com.phasmoware.down_but_not_out.util.TeamUtility;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ReviveTimer {
     @NotNull
-    private final ServerPlayerEntity downed;
+    private final ServerPlayer downed;
     private boolean interactionActive = false;
     private long reviveProgressTicks;
     @Nullable
-    private ServerPlayerEntity reviver;
+    private ServerPlayer reviver;
 
-    public ReviveTimer(@Nullable ServerPlayerEntity reviver, @NotNull ServerPlayerEntity downed) {
+    public ReviveTimer(@Nullable ServerPlayer reviver, @NotNull ServerPlayer downed) {
         this.reviver = reviver;
         this.downed = downed;
     }
@@ -46,9 +46,9 @@ public class ReviveTimer {
 
 
     private void updateReviveProgress() {
-        Text msgToReviver = Text.literal("Hold to Revive: " + getCurrentProgressPercent() + "%").formatted(Formatting.AQUA);
+        Component msgToReviver = Component.literal("Hold to Revive: " + getCurrentProgressPercent() + "%").withStyle(ChatFormatting.AQUA);
         MessageHandler.sendThrottledUpdateMessage(msgToReviver, reviver);
-        Text msgToDowned = Text.literal("Reviving: " + getCurrentProgressPercent() + "%").formatted(Formatting.AQUA);
+        Component msgToDowned = Component.literal("Reviving: " + getCurrentProgressPercent() + "%").withStyle(ChatFormatting.AQUA);
         MessageHandler.sendThrottledUpdateMessage(msgToDowned, downed);
     }
 
@@ -67,7 +67,7 @@ public class ReviveTimer {
         }
     }
 
-    public void continueRevive(ServerPlayerEntity reviver) {
+    public void continueRevive(ServerPlayer reviver) {
         if (this.reviver != reviver) {
             this.reviver = reviver;
         }

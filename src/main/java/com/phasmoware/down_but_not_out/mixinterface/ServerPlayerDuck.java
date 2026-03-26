@@ -2,9 +2,9 @@ package com.phasmoware.down_but_not_out.mixinterface;
 
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.monster.Shulker;
 
 public interface ServerPlayerDuck {
 
@@ -12,17 +12,17 @@ public interface ServerPlayerDuck {
 
     ReviveTimer dbno$getReviveTimer();
 
-    ShulkerEntity dbno$getInvisibleShulkerEntity();
+    Shulker dbno$getInvisibleShulkerEntity();
 
-    void dbno$setInvisibleShulkerEntity(ShulkerEntity shulkerEntity);
+    void dbno$setInvisibleShulkerEntity(Shulker shulkerEntity);
 
-    ArmorStandEntity dbno$getInvisibleArmorStandEntity();
+    ArmorStand dbno$getInvisibleArmorStandEntity();
 
-    void dbno$setInvisibleArmorStandEntity(ArmorStandEntity armorStandEntity);
+    void dbno$setInvisibleArmorStandEntity(ArmorStand armorStandEntity);
 
-    Text dbno$getLastUpdateText();
+    Component dbno$getLastUpdateText();
 
-    void dbno$setLastUpdateText(Text lastUpdateText);
+    void dbno$setLastUpdateText(Component lastUpdateText);
 
     long dbno$getTicksSinceLastUpdate();
 

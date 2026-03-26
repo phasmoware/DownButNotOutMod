@@ -5,24 +5,24 @@ import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.handler.MessageHandler;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import com.phasmoware.down_but_not_out.util.*;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 
 public class StateManager {
 
 
-    public static void onDeathEventOfDownedPlayer(ServerPlayerEntity player, DamageSource damageSource) {
+    public static void onDeathEventOfDownedPlayer(ServerPlayer player, DamageSource damageSource) {
         ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
         serverPlayer.dbno$getBleedOutTimer().reset();
         DownedUtility.removeDownedState(player);
         ServerCrawlUtility.cleanUpForceCrawlEntities((ServerPlayerDuck) player);
-        Text bledOutMessage = Text.literal(Constants.BLED_OUT_MSG).formatted(Formatting.RED);
+        Component bledOutMessage = Component.literal(Constants.BLED_OUT_MSG).withStyle(ChatFormatting.RED);
         MessageHandler.sendUpdateMessage(bledOutMessage, player);
     }
 
-    public static void onPlayerDownedEvent(ServerPlayerEntity player, DamageSource damageSource) {
+    public static void onPlayerDownedEvent(ServerPlayer player, DamageSource damageSource) {
         ServerCrawlUtility.setInvisibleShulkerArmorStandRider((ServerPlayerDuck) player);
         DownedUtility.applyDownedState(player);
         SoundUtility.playDownedSound(player);
@@ -36,25 +36,25 @@ public class StateManager {
             TeamUtility.assignShulkerAndArmorStandToTempDownedTeam(player);
         }
 
-        MessageHandler.broadcastMessageToPlayers(player.getName().getLiteralString() +
-                Constants.DOWNED_STATE_MSG, player.getEntityWorld(), Formatting.RED);
+        MessageHandler.broadcastMessageToPlayers(player.getName().tryCollapseToString() +
+                Constants.DOWNED_STATE_MSG, player.level(), ChatFormatting.RED);
 
         MessageHandler.sendClickableGiveUpMessage(player);
     }
 
-    public static void onPlayerDownedInEmptyServer(ServerPlayerEntity player) {
-        Text skippedDownedStateMessage = Text.literal(Constants.SKIPPED_DOWNED_STATE_MSG).formatted(Formatting.RED);
+    public static void onPlayerDownedInEmptyServer(ServerPlayer player) {
+        Component skippedDownedStateMessage = Component.literal(Constants.SKIPPED_DOWNED_STATE_MSG).withStyle(ChatFormatting.RED);
         MessageHandler.sendUpdateMessage(skippedDownedStateMessage, player);
     }
 
-    public static void onBleedOutEvent(ServerPlayerEntity player, DamageSource damageSource) {
+    public static void onBleedOutEvent(ServerPlayer player, DamageSource damageSource) {
         DownedUtility.bleedOut(player, damageSource);
         ServerCrawlUtility.cleanUpForceCrawlEntities((ServerPlayerDuck) player);
     }
 
-    public static void onReviveComplete(ServerPlayerEntity player, ServerPlayerEntity reviver) {
-        MessageHandler.broadcastMessageToPlayers(reviver.getName().getLiteralString() +
-                Constants.REVIVED_MSG + player.getName().getLiteralString(), player.getEntityWorld(), Formatting.GREEN);
+    public static void onReviveComplete(ServerPlayer player, ServerPlayer reviver) {
+        MessageHandler.broadcastMessageToPlayers(reviver.getName().tryCollapseToString() +
+                Constants.REVIVED_MSG + player.getName().tryCollapseToString(), player.level(), ChatFormatting.GREEN);
         ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
         ReviveUtility.applyRevivedPenalty(serverPlayer);
         SoundUtility.playRevivedSound(player);
@@ -62,7 +62,7 @@ public class StateManager {
         ServerCrawlUtility.cleanUpForceCrawlEntities((ServerPlayerDuck) player);
     }
 
-    public static void onReviveInteractionEvent(ServerPlayerEntity downed, ServerPlayerEntity reviver) {
+    public static void onReviveInteractionEvent(ServerPlayer downed, ServerPlayer reviver) {
         ServerPlayerDuck downedPlayer = (ServerPlayerDuck) downed;
         ReviveTimer reviveTimer = downedPlayer.dbno$getReviveTimer();
         reviveTimer.continueRevive(reviver);

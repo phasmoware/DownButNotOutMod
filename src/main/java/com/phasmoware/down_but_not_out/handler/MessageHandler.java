@@ -3,35 +3,35 @@ package com.phasmoware.down_but_not_out.handler;
 import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.util.Constants;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 public class MessageHandler {
 
-    public static void sendClickableGiveUpMessage(ServerPlayerEntity player) {
-        player.sendMessage(Text.literal("Click or type ").styled(style -> style
+    public static void sendClickableGiveUpMessage(ServerPlayer player) {
+        player.displayClientMessage(Component.literal("Click or type ").withStyle(style -> style
                 .withBold(true)
                 .withItalic(true)
-                .withColor(Formatting.GRAY))
-                .append(Text.literal("/" + Constants.COMMAND_STRING)
-                        .styled(style -> style
-                                .withColor(Formatting.RED)
-                                .withUnderline(true).withBold(true)
+                .withColor(ChatFormatting.GRAY))
+                .append(Component.literal("/" + Constants.COMMAND_STRING)
+                        .withStyle(style -> style
+                                .withColor(ChatFormatting.RED)
+                                .withUnderlined(true).withBold(true)
                                 .withClickEvent(new ClickEvent.RunCommand(Constants.COMMAND_STRING))
-                                .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run Command /" + Constants.COMMAND_STRING)))))
-                .append(Text.literal(" to give up and respawn")
-                        .styled(style -> style
+                                .withHoverEvent(new HoverEvent.ShowText(Component.literal("Run Command /" + Constants.COMMAND_STRING)))))
+                .append(Component.literal(" to give up and respawn")
+                        .withStyle(style -> style
                                 .withBold(true).
                                 withItalic(true)
-                                .withColor(Formatting.GRAY))), false); // can't be an overlay with a click event
+                                .withColor(ChatFormatting.GRAY))), false); // can't be an overlay with a click event
     }
 
-    public static void sendThrottledUpdateMessage(Text message, ServerPlayerEntity player) {
+    public static void sendThrottledUpdateMessage(Component message, ServerPlayer player) {
         ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
         if (ModConfig.INSTANCE.USE_OVERLAY_MESSAGES || serverPlayer.dbno$getTicksSinceLastUpdate() > Constants.UPDATE_MSG_SPAM_COOLDOWN) {
             serverPlayer.dbno$setTicksSinceLastUpdate(0);
@@ -39,44 +39,44 @@ public class MessageHandler {
         }
     }
 
-    public static void sendUpdateMessage(Text message, ServerPlayerEntity player) {
+    public static void sendUpdateMessage(Component message, ServerPlayer player) {
         ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
         if (!message.equals(serverPlayer.dbno$getLastUpdateText()) || serverPlayer.dbno$getTicksSinceLastUpdate() > Constants.REPEAT_MSG_SPAM_COOLDOWN) {
             serverPlayer.dbno$setLastUpdateText(message);
-            player.sendMessage(message, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+            player.displayClientMessage(message, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
         }
     }
 
-    public static void sendErrorMessage(Text message, ServerCommandSource source) {
-        source.sendError(message);
+    public static void sendErrorMessage(Component message, CommandSourceStack source) {
+        source.sendFailure(message);
     }
 
-    public static void broadcastMessageToPlayers(String message, ServerWorld world, Formatting formatting) {
-        Text text = Text.literal(message).formatted(formatting);
-        world.getServer().getPlayerManager().broadcast(text, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+    public static void broadcastMessageToPlayers(String message, ServerLevel world, ChatFormatting formatting) {
+        Component text = Component.literal(message).withStyle(formatting);
+        world.getServer().getPlayerList().broadcastSystemMessage(text, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
     }
 
-    public static void onPlayerDownedInLava(ServerPlayerEntity player) {
-        Text skippedDownedStateMessage = Text.literal(Constants.LAVA_PREVENTED_DOWNED_MSG).formatted(Formatting.RED);
+    public static void onPlayerDownedInLava(ServerPlayer player) {
+        Component skippedDownedStateMessage = Component.literal(Constants.LAVA_PREVENTED_DOWNED_MSG).withStyle(ChatFormatting.RED);
         MessageHandler.sendUpdateMessage(skippedDownedStateMessage, player);
     }
 
-    public static void onPlayerRevivingWithoutEmptyHand(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
+    public static void onPlayerRevivingWithoutEmptyHand(ServerPlayer reviver, ServerPlayer downed) {
         MessageHandler.sendUpdateMessage(Constants.USE_EMPTY_HAND_TO_REVIVE_TEXT, reviver);
         MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
     }
 
-    public static void onPlayerRevivingTooFarAway(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
+    public static void onPlayerRevivingTooFarAway(ServerPlayer reviver, ServerPlayer downed) {
         MessageHandler.sendUpdateMessage(Constants.TOO_FAR_AWAY_TO_REVIVE_TEXT, reviver);
         MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
     }
 
-    public static void onPlayerLookingAwayWhileReviving(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
+    public static void onPlayerLookingAwayWhileReviving(ServerPlayer reviver, ServerPlayer downed) {
         MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, reviver);
         MessageHandler.sendUpdateMessage(Constants.REVIVE_CANCELED_TEXT, downed);
     }
 
-    public static void onPlayerRevivingFromDifferentTeam(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
+    public static void onPlayerRevivingFromDifferentTeam(ServerPlayer reviver, ServerPlayer downed) {
         MessageHandler.sendUpdateMessage(Constants.REVIVER_NOT_TEAMMATE_TEXT, reviver);
         MessageHandler.sendUpdateMessage(Constants.REVIVER_NOT_TEAMMATE_TEXT, downed);
     }

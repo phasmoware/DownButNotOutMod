@@ -4,10 +4,10 @@ import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.handler.MessageHandler;
 import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import java.util.Optional;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
 
@@ -20,20 +20,20 @@ public class ReviveUtility {
         }
     }
 
-    public static boolean isLookingAtPlayer(ServerPlayerEntity viewer, ServerPlayerEntity target) {
+    public static boolean isLookingAtPlayer(ServerPlayer viewer, ServerPlayer target) {
         if (viewer == target) {
             return false;
         }
-        Vec3d eyePos = viewer.getCameraPosVec(Constants.MIN_TICK_PROGRESS);
-        Vec3d lookDir = viewer.getRotationVec(Constants.MIN_TICK_PROGRESS);
-        Vec3d rayEnd = eyePos.add(lookDir.multiply(viewer.getEntityInteractionRange()));
+        Vec3 eyePos = viewer.getEyePosition(Constants.MIN_TICK_PROGRESS);
+        Vec3 lookDir = viewer.getViewVector(Constants.MIN_TICK_PROGRESS);
+        Vec3 rayEnd = eyePos.add(lookDir.scale(viewer.entityInteractionRange()));
         // expand by a bit for stability
-        Box targetBox = target.getBoundingBox().expand(0.1);
-        Optional<Vec3d> hit = targetBox.raycast(eyePos, rayEnd);
+        AABB targetBox = target.getBoundingBox().inflate(0.1);
+        Optional<Vec3> hit = targetBox.clip(eyePos, rayEnd);
         return hit.isPresent();
     }
 
-    public static boolean checkValidReviver(ServerPlayerEntity reviver, ServerPlayerEntity downed) {
+    public static boolean checkValidReviver(ServerPlayer reviver, ServerPlayer downed) {
         if (reviver == null || downed == null) {
             return false;
         }
@@ -47,16 +47,16 @@ public class ReviveUtility {
             return false;
         }
         if (ModConfig.INSTANCE.RESTRICT_REVIVE_TO_TEAMMATES_OR_TEAMLESS) {
-            if ((reviver.getScoreboardTeam() != null && !TeamUtility.isOnTempDownedTeam(downed)) && (!reviver.getScoreboardTeam().equals(downed.getScoreboardTeam()))) {
+            if ((reviver.getTeam() != null && !TeamUtility.isOnTempDownedTeam(downed)) && (!reviver.getTeam().equals(downed.getTeam()))) {
                 MessageHandler.onPlayerRevivingFromDifferentTeam(reviver, downed);
                 return false;
             }
         }
-        if (!(reviver.getMainHandStack().isEmpty() && ModConfig.INSTANCE.REVIVING_REQUIRES_EMPTY_HAND)) {
+        if (!(reviver.getMainHandItem().isEmpty() && ModConfig.INSTANCE.REVIVING_REQUIRES_EMPTY_HAND)) {
             MessageHandler.onPlayerRevivingWithoutEmptyHand(reviver, downed);
             return false;
         }
-        if ((reviver.squaredDistanceTo(downed) > reviver.getBlockInteractionRange())) {
+        if ((reviver.distanceToSqr(downed) > reviver.blockInteractionRange())) {
             MessageHandler.onPlayerRevivingTooFarAway(reviver, downed);
             return false;
         }

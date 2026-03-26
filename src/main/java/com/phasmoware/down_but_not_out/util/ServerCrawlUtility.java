@@ -3,76 +3,76 @@ package com.phasmoware.down_but_not_out.util;
 import com.phasmoware.down_but_not_out.config.ModConfig;
 import com.phasmoware.down_but_not_out.mixin.ArmorStandEntityAccessor;
 import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.attribute.EntityAttributeInstance;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.monster.Shulker;
+import net.minecraft.world.phys.Vec3;
 
 public class ServerCrawlUtility {
 
-    public static ArmorStandEntity spawnInvisibleArmorStand(ServerPlayerEntity player) {
-        ArmorStandEntity armorStand = new ArmorStandEntity(EntityType.ARMOR_STAND, player.getEntityWorld());
+    public static ArmorStand spawnInvisibleArmorStand(ServerPlayer player) {
+        ArmorStand armorStand = new ArmorStand(EntityType.ARMOR_STAND, player.level());
         armorStand.setInvisible(true);
         armorStand.setNoGravity(true);
         armorStand.setInvulnerable(true);
         armorStand.setSilent(true);
-        armorStand.setPosition(player.getEntityPos());
-        armorStand.addCommandTag(Constants.DOWNED_TAG);
+        armorStand.setPos(player.position());
+        armorStand.addTag(Constants.DOWNED_TAG);
         if (ModConfig.INSTANCE.SHOW_REVIVE_TAG_ABOVE_PLAYER) {
             armorStand.setCustomNameVisible(true);
-            armorStand.setCustomName(Text.literal(Constants.CUSTOM_REVIVE_TAG_ABOVE_NAME));
+            armorStand.setCustomName(Component.literal(Constants.CUSTOM_REVIVE_TAG_ABOVE_NAME));
 
         } else {
             armorStand.setCustomNameVisible(false);
         }
-        EntityAttributeInstance armorStandScale = armorStand.getAttributeInstance(EntityAttributes.SCALE);
+        AttributeInstance armorStandScale = armorStand.getAttribute(Attributes.SCALE);
         if (armorStandScale != null) {
             armorStandScale.setBaseValue(Constants.MIN_ENTITY_SCALE);
         }
         ArmorStandEntityAccessor accessor = (ArmorStandEntityAccessor) armorStand;
         accessor.invokeSetMarker(true);
         accessor.invokeSetSmall(true);
-        player.getEntityWorld().spawnEntity(armorStand);
+        player.level().addFreshEntity(armorStand);
         return armorStand;
     }
 
-    public static ShulkerEntity spawnInvisibleShulker(ServerPlayerEntity player) {
-        ShulkerEntity shulkerEntity = new ShulkerEntity(EntityType.SHULKER, player.getEntityWorld());
-        shulkerEntity.setPosition(player.getEntityPos());
+    public static Shulker spawnInvisibleShulker(ServerPlayer player) {
+        Shulker shulkerEntity = new Shulker(EntityType.SHULKER, player.level());
+        shulkerEntity.setPos(player.position());
         shulkerEntity.setInvulnerable(true);
         shulkerEntity.setNoGravity(true);
-        shulkerEntity.setAiDisabled(true);
+        shulkerEntity.setNoAi(true);
         shulkerEntity.setSilent(true);
         shulkerEntity.setCustomNameVisible(false);
-        shulkerEntity.addCommandTag(Constants.DOWNED_TAG);
+        shulkerEntity.addTag(Constants.DOWNED_TAG);
         // for compatability with https://modrinth.com/datapack/random-mob-sizes-dp
-        shulkerEntity.addCommandTag(Constants.IGNORE_TAG);
+        shulkerEntity.addTag(Constants.IGNORE_TAG);
 
-        EntityAttributeInstance attributeInstance = shulkerEntity.getAttributeInstance(EntityAttributes.SCALE);
+        AttributeInstance attributeInstance = shulkerEntity.getAttribute(Attributes.SCALE);
         if (attributeInstance != null) {
             attributeInstance.setBaseValue(Constants.MIN_ENTITY_SCALE);
         }
         shulkerEntity.setInvisible(true);
-        StatusEffectInstance instance = new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false);
-        shulkerEntity.addStatusEffect(instance);
-        player.getEntityWorld().spawnEntity(shulkerEntity);
+        MobEffectInstance instance = new MobEffectInstance(MobEffects.INVISIBILITY, -1, 0, false, false);
+        shulkerEntity.addEffect(instance);
+        player.level().addFreshEntity(shulkerEntity);
 
         return shulkerEntity;
     }
 
     public static void setInvisibleShulkerArmorStandRider(ServerPlayerDuck player) {
         // spawns and saves invisible Shulker (passenger)
-        player.dbno$setInvisibleShulkerEntity(spawnInvisibleShulker((ServerPlayerEntity) player));
+        player.dbno$setInvisibleShulkerEntity(spawnInvisibleShulker((ServerPlayer) player));
         // spawns and saves ArmorStand (vehicle)
-        player.dbno$setInvisibleArmorStandEntity(spawnInvisibleArmorStand((ServerPlayerEntity) player));
+        player.dbno$setInvisibleArmorStandEntity(spawnInvisibleArmorStand((ServerPlayer) player));
         // spawn and mount Shulker on top of ArmorStand
         player.dbno$getInvisibleShulkerEntity().startRiding(player.dbno$getInvisibleArmorStandEntity(), true, true);
     }
@@ -89,11 +89,11 @@ public class ServerCrawlUtility {
     }
 
     public static void forceCrawlPose(ServerPlayerDuck serverPlayer) {
-        ServerPlayerEntity player = (ServerPlayerEntity) serverPlayer;
-        Vec3d headPosition = player.getEntityPos().offset(Direction.UP, Constants.Y_OFFSET);
-        if (serverPlayer.dbno$getInvisibleShulkerEntity() != null && serverPlayer.dbno$getInvisibleShulkerEntity().getEntityPos().squaredDistanceTo(headPosition) > 0.01) {
+        ServerPlayer player = (ServerPlayer) serverPlayer;
+        Vec3 headPosition = player.position().relative(Direction.UP, Constants.Y_OFFSET);
+        if (serverPlayer.dbno$getInvisibleShulkerEntity() != null && serverPlayer.dbno$getInvisibleShulkerEntity().position().distanceToSqr(headPosition) > 0.01) {
             if (serverPlayer.dbno$getInvisibleArmorStandEntity() != null && !serverPlayer.dbno$getInvisibleArmorStandEntity().isRemoved()) {
-                serverPlayer.dbno$getInvisibleArmorStandEntity().setPosition(headPosition.x, headPosition.y, headPosition.z);
+                serverPlayer.dbno$getInvisibleArmorStandEntity().setPos(headPosition.x, headPosition.y, headPosition.z);
             } else if (serverPlayer.dbno$getInvisibleShulkerEntity() == null || serverPlayer.dbno$getInvisibleShulkerEntity().isRemoved()) {
                 setInvisibleShulkerArmorStandRider(serverPlayer);
                 TeamUtility.assignShulkerAndArmorStandToTempDownedTeam(player);

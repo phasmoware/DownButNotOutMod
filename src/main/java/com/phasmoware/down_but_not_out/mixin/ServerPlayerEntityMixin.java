@@ -5,13 +5,13 @@ import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
 import com.phasmoware.down_but_not_out.timer.BleedOutTimer;
 import com.phasmoware.down_but_not_out.timer.ReviveTimer;
 import com.phasmoware.down_but_not_out.util.ServerCrawlUtility;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.monster.Shulker;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -21,29 +21,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static com.phasmoware.down_but_not_out.util.DownedUtility.isDowned;
 
-@Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin extends PlayerEntity implements ServerPlayerDuck {
+@Mixin(ServerPlayer.class)
+public abstract class ServerPlayerEntityMixin extends Player implements ServerPlayerDuck {
 
     @Unique
-    private final BleedOutTimer bleedOutTimer = new BleedOutTimer((ServerPlayerEntity) (Object) this);
+    private final BleedOutTimer bleedOutTimer = new BleedOutTimer((ServerPlayer) (Object) this);
 
     @Unique
-    private final ReviveTimer reviveTimer = new ReviveTimer(null, (ServerPlayerEntity) (Object) this);
+    private final ReviveTimer reviveTimer = new ReviveTimer(null, (ServerPlayer) (Object) this);
     @Unique
     public long ticksSinceLastUpdate;
     @Unique
-    private ShulkerEntity invisibleShulkerEntity;
+    private Shulker invisibleShulkerEntity;
     @Unique
-    private ArmorStandEntity invisibleArmorStandEntity;
+    private ArmorStand invisibleArmorStandEntity;
     @Unique
-    private Text lastUpdateText;
+    private Component lastUpdateText;
 
-    public ServerPlayerEntityMixin(World world, GameProfile profile) {
+    public ServerPlayerEntityMixin(Level world, GameProfile profile) {
         super(world, profile);
     }
 
     @Shadow
-    public abstract ServerWorld getEntityWorld();
+    public abstract ServerLevel level();
 
     @Inject(method = "tick()V", at = @At("TAIL"))
     private void injectTickPlayer(CallbackInfo ci) {
@@ -66,32 +66,32 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
     }
 
     @Override
-    public ShulkerEntity dbno$getInvisibleShulkerEntity() {
+    public Shulker dbno$getInvisibleShulkerEntity() {
         return this.invisibleShulkerEntity;
     }
 
     @Override
-    public void dbno$setInvisibleShulkerEntity(ShulkerEntity shulkerEntity) {
+    public void dbno$setInvisibleShulkerEntity(Shulker shulkerEntity) {
         this.invisibleShulkerEntity = shulkerEntity;
     }
 
     @Override
-    public ArmorStandEntity dbno$getInvisibleArmorStandEntity() {
+    public ArmorStand dbno$getInvisibleArmorStandEntity() {
         return this.invisibleArmorStandEntity;
     }
 
     @Override
-    public void dbno$setInvisibleArmorStandEntity(ArmorStandEntity armorStandEntity) {
+    public void dbno$setInvisibleArmorStandEntity(ArmorStand armorStandEntity) {
         this.invisibleArmorStandEntity = armorStandEntity;
     }
 
     @Override
-    public Text dbno$getLastUpdateText() {
+    public Component dbno$getLastUpdateText() {
         return this.lastUpdateText;
     }
 
     @Override
-    public void dbno$setLastUpdateText(Text lastText) {
+    public void dbno$setLastUpdateText(Component lastText) {
         this.lastUpdateText = lastText;
     }
 

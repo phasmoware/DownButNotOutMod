@@ -1,119 +1,119 @@
 package com.phasmoware.down_but_not_out.util;
 
 import com.phasmoware.down_but_not_out.mixinterface.ServerPlayerDuck;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.scoreboard.AbstractTeam;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.monster.Shulker;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.Team;
 
 public class TeamUtility {
 
-    public static boolean isOnTempDownedTeam(ServerPlayerEntity player) {
-        Team team = player.getScoreboardTeam();
+    public static boolean isOnTempDownedTeam(ServerPlayer player) {
+        PlayerTeam team = player.getTeam();
         if (team == null) {
             return false;
         }
         return team.getName().equals(getTempDownedTeamName(player));
     }
 
-    public static String getTempDownedTeamName(ServerPlayerEntity player) {
-        return Constants.MOD_ABBREV_PREFIX + player.getUuidAsString();
+    public static String getTempDownedTeamName(ServerPlayer player) {
+        return Constants.MOD_ABBREV_PREFIX + player.getStringUUID();
     }
 
-    public static Text getTempDownedTeamDisplayName(ServerPlayerEntity player) {
-        return Text.literal(Constants.MOD_ABBREV_PREFIX).append(player.getName());
+    public static Component getTempDownedTeamDisplayName(ServerPlayer player) {
+        return Component.literal(Constants.MOD_ABBREV_PREFIX).append(player.getName());
     }
 
-    public static Team getTempDownedTeam(ServerPlayerEntity player) {
+    public static PlayerTeam getTempDownedTeam(ServerPlayer player) {
         String teamName = getTempDownedTeamName(player);
-        Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
-        return scoreboard.getTeam(teamName);
+        Scoreboard scoreboard = player.level().getScoreboard();
+        return scoreboard.getPlayerTeam(teamName);
     }
 
-    public static Team addTempTeamToScoreboard(ServerPlayerEntity player) {
-        Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
+    public static PlayerTeam addTempTeamToScoreboard(ServerPlayer player) {
+        Scoreboard scoreboard = player.level().getScoreboard();
         String teamName = getTempDownedTeamName(player);
-        Text teamDisplayName = getTempDownedTeamDisplayName(player);
-        Team team = scoreboard.addTeam(teamName);
+        Component teamDisplayName = getTempDownedTeamDisplayName(player);
+        PlayerTeam team = scoreboard.addPlayerTeam(teamName);
         team.setDisplayName(teamDisplayName);
-        team.setFriendlyFireAllowed(true);
-        team.setShowFriendlyInvisibles(false);
-        team.setCollisionRule(AbstractTeam.CollisionRule.PUSH_OWN_TEAM);
-        team.setColor(Formatting.DARK_RED);
+        team.setAllowFriendlyFire(true);
+        team.setSeeFriendlyInvisibles(false);
+        team.setCollisionRule(Team.CollisionRule.PUSH_OWN_TEAM);
+        team.setColor(ChatFormatting.DARK_RED);
         return team;
     }
 
-    public static void assignTempDownedTeam(ServerPlayerEntity player) {
+    public static void assignTempDownedTeam(ServerPlayer player) {
         // player can only be on one team so we should not overwrite a current team
         // only applies if player is not part of a different team already
-        Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
+        Scoreboard scoreboard = player.level().getScoreboard();
         String teamName = getTempDownedTeamName(player);
-        Team team = scoreboard.getTeam(teamName);
-        if (player.getScoreboardTeam() == null) {
+        PlayerTeam team = scoreboard.getPlayerTeam(teamName);
+        if (player.getTeam() == null) {
             if (team == null) {
                 team = addTempTeamToScoreboard(player);
             }
-            scoreboard.addScoreHolderToTeam(player.getNameForScoreboard(), team);
+            scoreboard.addPlayerToTeam(player.getScoreboardName(), team);
         }
     }
 
-    public static void removeTempDownedTeam(ServerPlayerEntity player) {
-        Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
-        Team team = scoreboard.getTeam(getTempDownedTeamName(player));
+    public static void removeTempDownedTeam(ServerPlayer player) {
+        Scoreboard scoreboard = player.level().getScoreboard();
+        PlayerTeam team = scoreboard.getPlayerTeam(getTempDownedTeamName(player));
         if (team != null) {
-            scoreboard.removeTeam(team);
+            scoreboard.removePlayerTeam(team);
         }
     }
 
-    public static void updateTempTeamColor(ServerPlayerEntity player, Formatting color) {
+    public static void updateTempTeamColor(ServerPlayer player, ChatFormatting color) {
         if (getTempDownedTeam(player) != null) {
-            Team team = getTempDownedTeam(player);
+            PlayerTeam team = getTempDownedTeam(player);
             if (team != null && !(team.getColor().equals(color))) {
                 team.setColor(color);
             }
         }
     }
 
-    public static void updateRevivingTeamColor(ServerPlayerEntity player) {
-        updateTempTeamColor(player, Formatting.AQUA);
+    public static void updateRevivingTeamColor(ServerPlayer player) {
+        updateTempTeamColor(player, ChatFormatting.AQUA);
     }
 
-    public static void updateBleedOutStatusTeamColor(ServerPlayerEntity player, float progress) {
+    public static void updateBleedOutStatusTeamColor(ServerPlayer player, float progress) {
         updateTempTeamColor(player, getProgressColor(progress));
     }
 
-    public static Formatting getProgressColor(float progress) {
+    public static ChatFormatting getProgressColor(float progress) {
         if (progress == 0f) {
-            return Formatting.GRAY;
+            return ChatFormatting.GRAY;
         } else if (progress > 0f && progress <= 0.25f) {
-            return Formatting.YELLOW;
+            return ChatFormatting.YELLOW;
         } else if (progress > 0.25f && progress <= 0.5f) {
-            return Formatting.GOLD;
+            return ChatFormatting.GOLD;
         } else if (progress > 0.5f && progress <= 0.75f) {
-            return Formatting.RED;
+            return ChatFormatting.RED;
         } else if (progress > 0.75f && progress <= 0.99f) {
-            return Formatting.DARK_RED;
+            return ChatFormatting.DARK_RED;
         } else {
-            return Formatting.GRAY;
+            return ChatFormatting.GRAY;
         }
     }
 
-    public static void assignShulkerAndArmorStandToTempDownedTeam(ServerPlayerEntity player) {
+    public static void assignShulkerAndArmorStandToTempDownedTeam(ServerPlayer player) {
         ServerPlayerDuck serverPlayer = (ServerPlayerDuck) player;
-        ShulkerEntity shulker = serverPlayer.dbno$getInvisibleShulkerEntity();
-        ArmorStandEntity armorStandEntity = serverPlayer.dbno$getInvisibleArmorStandEntity();
-        Scoreboard scoreboard = player.getEntityWorld().getScoreboard();
-        Team team = getTempDownedTeam(player);
+        Shulker shulker = serverPlayer.dbno$getInvisibleShulkerEntity();
+        ArmorStand armorStandEntity = serverPlayer.dbno$getInvisibleArmorStandEntity();
+        Scoreboard scoreboard = player.level().getScoreboard();
+        PlayerTeam team = getTempDownedTeam(player);
         if (team == null) {
             team = addTempTeamToScoreboard(player);
         }
         if (shulker != null && armorStandEntity != null) {
-            scoreboard.addScoreHolderToTeam(shulker.getNameForScoreboard(), team);
-            scoreboard.addScoreHolderToTeam(armorStandEntity.getNameForScoreboard(), team);
+            scoreboard.addPlayerToTeam(shulker.getScoreboardName(), team);
+            scoreboard.addPlayerToTeam(armorStandEntity.getScoreboardName(), team);
         }
     }
 }
