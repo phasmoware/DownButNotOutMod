@@ -9,6 +9,7 @@ public final class ModConfig {
     public boolean REVIVING_REQUIRES_EMPTY_HAND = true;
     public boolean ALLOW_DOWNED_STATE_IN_LAVA = false;
     public boolean USE_OVERLAY_MESSAGES = true;
+    public boolean BROADCAST_PLAYER_DOWNED_NOTIFICATIONS = true;
     public boolean DOWNED_PLAYERS_HAVE_GLOW_EFFECT = true;
     public boolean DOWNED_PLAYERS_HAVE_BLINDNESS_EFFECT = true;
     public boolean RESTRICT_REVIVE_TO_TEAMMATES_OR_TEAMLESS = false;

@@ -16,6 +16,7 @@ To revive your downed friend, simply hold **right-click** with an empty hand on 
 - Player names and outline colors shift from yellow to dark red based on remaining time before bleeding out.
 - A bleed out timer is shown above the downed player and also above the downed player's hotbar
 - A /bleedout clickable command lets players give up early and respawn.
+- Use a Totem Of Undying while downed to revive yourself
 
 #### Compatibility
 
@@ -77,6 +78,10 @@ To revive your downed friend, simply hold **right-click** with an empty hand on 
   // NOTE: chat messages are throttled appropriately for revive progress percentage
   // Options: true, false
   "USE_OVERLAY_MESSAGES": true,
+
+  // System messages announce when a player is downed or revived in the chat or overlay
+  // Options: true, false
+  "BROADCAST_PLAYER_DOWNED_NOTIFICATIONS": true,
   
   // Give players that are downed a glow effect
   // NOTE: not visible on Geyser Bedrock Clients
