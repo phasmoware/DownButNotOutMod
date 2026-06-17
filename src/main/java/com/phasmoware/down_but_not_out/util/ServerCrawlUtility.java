@@ -9,7 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -19,7 +19,7 @@ import net.minecraft.world.phys.Vec3;
 public class ServerCrawlUtility {
 
     public static ArmorStand spawnInvisibleArmorStand(ServerPlayer player) {
-        ArmorStand armorStand = new ArmorStand(EntityType.ARMOR_STAND, player.level());
+        ArmorStand armorStand = new ArmorStand(EntityTypes.ARMOR_STAND, player.level());
         armorStand.setInvisible(true);
         armorStand.setNoGravity(true);
         armorStand.setInvulnerable(true);
@@ -45,7 +45,7 @@ public class ServerCrawlUtility {
     }
 
     public static Shulker spawnInvisibleShulker(ServerPlayer player) {
-        Shulker shulkerEntity = new Shulker(EntityType.SHULKER, player.level());
+        Shulker shulkerEntity = new Shulker(EntityTypes.SHULKER, player.level());
         shulkerEntity.setPos(player.position());
         shulkerEntity.setInvulnerable(true);
         shulkerEntity.setNoGravity(true);

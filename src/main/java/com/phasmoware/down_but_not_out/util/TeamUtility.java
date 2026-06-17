@@ -9,6 +9,9 @@ import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team;
+import net.minecraft.world.scores.TeamColor;
+
+import java.util.Optional;
 
 public class TeamUtility {
 
@@ -43,7 +46,7 @@ public class TeamUtility {
         team.setAllowFriendlyFire(true);
         team.setSeeFriendlyInvisibles(false);
         team.setCollisionRule(Team.CollisionRule.PUSH_OWN_TEAM);
-        team.setColor(ChatFormatting.DARK_RED);
+        team.setColor(Optional.of(TeamColor.DARK_RED));
         return team;
     }
 
@@ -73,7 +76,7 @@ public class TeamUtility {
         if (getTempDownedTeam(player) != null) {
             PlayerTeam team = getTempDownedTeam(player);
             if (team != null && !(team.getColor().equals(color))) {
-                team.setColor(color);
+                team.setColor(Optional.of(fromFormatting(color)));
             }
         }
     }
@@ -100,6 +103,27 @@ public class TeamUtility {
         } else {
             return ChatFormatting.GRAY;
         }
+    }
+
+    public static TeamColor fromFormatting(ChatFormatting formatting) {
+        return switch (formatting) {
+            case BLACK -> TeamColor.BLACK;
+            case DARK_BLUE -> TeamColor.DARK_BLUE;
+            case DARK_GREEN -> TeamColor.DARK_GREEN;
+            case DARK_AQUA -> TeamColor.DARK_AQUA;
+            case DARK_RED -> TeamColor.DARK_RED;
+            case DARK_PURPLE -> TeamColor.DARK_PURPLE;
+            case GOLD -> TeamColor.GOLD;
+            case GRAY -> TeamColor.GRAY;
+            case DARK_GRAY -> TeamColor.DARK_GRAY;
+            case BLUE -> TeamColor.BLUE;
+            case GREEN -> TeamColor.GREEN;
+            case AQUA -> TeamColor.AQUA;
+            case RED -> TeamColor.RED;
+            case LIGHT_PURPLE -> TeamColor.LIGHT_PURPLE;
+            case YELLOW -> TeamColor.YELLOW;
+            default -> TeamColor.WHITE;
+        };
     }
 
     public static void assignShulkerAndArmorStandToTempDownedTeam(ServerPlayer player) {

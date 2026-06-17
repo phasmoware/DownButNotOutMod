@@ -159,6 +159,9 @@ Geyser Bedrock Clients:
 Vanilla Clients:
 - None (please report via GitHub issues!)
 
+Essential Mod Client:
+- Hosting a server from a single player world does not load this mod
+
 </details>
 
 ## How to Use
