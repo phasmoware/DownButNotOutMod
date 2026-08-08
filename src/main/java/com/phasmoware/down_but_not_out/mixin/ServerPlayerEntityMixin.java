@@ -54,6 +54,11 @@ public abstract class ServerPlayerEntityMixin extends Player implements ServerPl
             ServerCrawlUtility.forceCrawlPose(this);
         }
     }
+    
+    @Inject(method = "remove", at = @At("HEAD"))
+    private void injectRemove(CallbackInfo ci) {
+        ServerCrawlUtility.cleanUpForceCrawlEntities(this);
+    }
 
     @Override
     public BleedOutTimer dbno$getBleedOutTimer() {
