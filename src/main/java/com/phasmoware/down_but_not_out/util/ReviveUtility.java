@@ -52,7 +52,7 @@ public class ReviveUtility {
                 return false;
             }
         }
-        if (!(reviver.getMainHandItem().isEmpty() && ModConfig.INSTANCE.REVIVING_REQUIRES_EMPTY_HAND)) {
+        if ((!reviver.getMainHandItem().isEmpty() && ModConfig.INSTANCE.REVIVING_REQUIRES_EMPTY_HAND)) {
             MessageHandler.onPlayerRevivingWithoutEmptyHand(reviver, downed);
             return false;
         }
