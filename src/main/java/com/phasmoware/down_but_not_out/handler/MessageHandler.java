@@ -52,8 +52,10 @@ public class MessageHandler {
     }
 
     public static void broadcastMessageToPlayers(String message, ServerLevel world, ChatFormatting formatting) {
-        Component text = Component.literal(message).withStyle(formatting);
-        world.getServer().getPlayerList().broadcastSystemMessage(text, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+        if (ModConfig.INSTANCE.BROADCAST_PLAYER_DOWNED_NOTIFICATIONS) {
+            Component text = Component.literal(message).withStyle(formatting);
+            world.getServer().getPlayerList().broadcastSystemMessage(text, ModConfig.INSTANCE.USE_OVERLAY_MESSAGES);
+        }
     }
 
     public static void onPlayerDownedInLava(ServerPlayer player) {
