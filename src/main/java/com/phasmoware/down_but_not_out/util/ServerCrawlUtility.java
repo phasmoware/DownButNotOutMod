@@ -22,7 +22,7 @@ public class ServerCrawlUtility {
         ArmorStand armorStand = new ArmorStand(EntityTypes.ARMOR_STAND, player.level());
         armorStand.setInvisible(true);
         armorStand.setNoGravity(true);
-        armorStand.setInvulnerable(true);
+        armorStand.setPermanentlyInvulnerable(true);
         armorStand.setSilent(true);
         armorStand.setPos(player.position());
         armorStand.addTag(Constants.DOWNED_TAG);
@@ -47,7 +47,7 @@ public class ServerCrawlUtility {
     public static Shulker spawnInvisibleShulker(ServerPlayer player) {
         Shulker shulkerEntity = new Shulker(EntityTypes.SHULKER, player.level());
         shulkerEntity.setPos(player.position());
-        shulkerEntity.setInvulnerable(true);
+        shulkerEntity.setPermanentlyInvulnerable(true);
         shulkerEntity.setNoGravity(true);
         shulkerEntity.setNoAi(true);
         shulkerEntity.setSilent(true);

@@ -18,7 +18,7 @@ import net.minecraft.world.level.GameType;
 public class DownedUtility {
 
     public static void bleedOut(ServerPlayer player, DamageSource damageSource) {
-        player.setInvulnerable(false);
+        player.setPermanentlyInvulnerable(false);
         // clear status effects to ensure that they are not invulnerable to the damage source type
         player.removeAllEffects();
         if (damageSource != null) {
@@ -92,7 +92,7 @@ public class DownedUtility {
             player.setHealth(Constants.HEARTS_WHILE_DOWNED);
             player.addTag(Constants.DOWNED_TAG);
             savePlayerData(player,true);
-            player.setInvulnerable(true);
+            player.setPermanentlyInvulnerable(true);
             if (ModConfig.INSTANCE.ALLOW_CHANGE_GAME_MODE) {
                 player.setGameMode(GameType.ADVENTURE);
             }
@@ -119,7 +119,7 @@ public class DownedUtility {
         if (player != null) {
             player.removeTag(Constants.DOWNED_TAG);
             savePlayerData(player, false, ModConfig.INSTANCE.BLEEDING_OUT_DURATION_TICKS);
-            player.setInvulnerable(false);
+            player.setPermanentlyInvulnerable(false);
             if (ModConfig.INSTANCE.ALLOW_CHANGE_GAME_MODE) {
                 player.setGameMode(GameType.SURVIVAL);
             }
